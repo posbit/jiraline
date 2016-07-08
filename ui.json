@@ -1,0 +1,27 @@
+{
+    "options": {
+        "global": [
+            {
+                "long": "verbose",
+                "short": "v",
+                "help": "display verbose output"
+            }
+        ]
+    },
+    "commands":{
+        "comment" : {
+            "options": {
+                "local": [
+                    {
+                        "short": "m",
+                        "help": "comment message",
+                        "arguments" : ["message:str"]
+                    }
+                ]
+            },
+            "operands":{
+                "no" : [1,1]
+            }
+        }
+    }
+}
