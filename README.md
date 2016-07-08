@@ -10,23 +10,22 @@ In file `~/.jiraline` put the following contents:
 
 ```
 {
-    "domain" : <your JIRA domain @ attlasian.net e.g. posbit>,
-    "credentials":{
-        "user":<your user name>,
-        "password":<your password>
+    "domain": <your JIRA cloud domain>,
+    "credentials": {
+        "user": <your user name>,
+        "password": <your password>
      }
 }
 ```
 
-Sample valid config:
-
+Sample valid config that will let you connect to `example.atlassian.net`:
 
 ```
 {
-    "domain" : "posbit",
-    "credentials":{
-        "user":"example"
-        "password":"secret_password1"
+    "domain": "example",
+    "credentials": {
+        "user": "username"
+        "password": "$ecretP4s$w0rd1"
      }
 }
 ```
