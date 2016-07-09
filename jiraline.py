@@ -67,6 +67,19 @@ def commandAssign(ui):
     elif r.status_code == 404:
         print("Either the issue or the user does not exist.")
 
+def commandIssue(ui):
+    issue_name = ui.operands()[0]
+    if "-t" in ui:
+        r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings["domain"],issue_name),
+                      auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
+        if r.status_code == 404:
+            print("The requested issue is not found or the user does not have permission to view it.")
+        elif r.status_code == 200:
+            response = json.loads(r.text)
+            for t in response["transitions"]:
+                print(t["name"])
+    else:
+        exit(1)
 
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
@@ -96,4 +109,5 @@ def dispatch(ui, *commands, overrides = {}, default_command=''):
 dispatch(ui,        # first: pass the UI object to dispatch
     commandComment,    # second: pass command handling functions
     commandAssign,
+    commandIssue,
 )
