@@ -49,6 +49,24 @@ def commandComment(ui):
     if r.status_code == 400:
         print('The input is invalid (e.g. missing required fields, invalid values, and so forth).')
 
+def commandAssign(ui):
+    issue_name = ui.operands()[0]
+    user_name = ""
+    if "-u" in ui:
+        user_name = ui.get("-u")
+    else:
+        exit(1)
+    assing={"name":user_name}
+    r = requests.put('https://{}.atlassian.net/rest/api/2/issue/{}/assignee'.format(settings["domain"],issue_name),
+                      json=assing,
+                      auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
+    if r.status_code == 400:
+        print('There is a problem with the received user representation.')
+    elif r.status_code == 401:
+        print("Calling user does not have permission to assign the issue.")
+    elif r.status_code == 404:
+        print("Either the issue or the user does not exist.")
+
 
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
@@ -77,4 +95,5 @@ def dispatch(ui, *commands, overrides = {}, default_command=''):
 
 dispatch(ui,        # first: pass the UI object to dispatch
     commandComment,    # second: pass command handling functions
+    commandAssign,
 )
