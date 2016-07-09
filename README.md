@@ -1,6 +1,14 @@
 # jiraline
 Command Line Inteface for JIRA
 
+> The aim of the project is to make developers
+> work with Jira faster. For those who work in the
+> terminal and don`t want to break workflow to
+> maintain Jira.
+>
+> Forget GUI, use jiraline!
+>
+
 ----
 
 # Settings
