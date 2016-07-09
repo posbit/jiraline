@@ -29,13 +29,6 @@ finally:
 if clap.helper.HelpRunner(ui=ui, program=sys.argv[0]).adjust(options=['-h', '--help']).run().displayed(): exit(0)
 
 
-
-def comment_issue(issue_name,message):
-    comment={"body":message}
-    r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/comment'.format(settings["domain"],issue_name),
-                  json=comment,
-                      auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
-
 ui = ui.down()
 
 settings = {}
@@ -49,9 +42,12 @@ def commandComment(ui):
         message = ui.get("-m")
     else:
         message = input("Please type comment message: ")
-    comment_issue(issue_name,message)
-
-
+    comment={"body":message}
+    r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/comment'.format(settings["domain"],issue_name),
+                      json=comment,
+                      auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
+    if r.status_code == 400:
+        print('The input is invalid (e.g. missing required fields, invalid values, and so forth).')
 
 
 def dispatch(ui, *commands, overrides = {}, default_command=''):
