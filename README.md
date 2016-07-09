@@ -1,18 +1,18 @@
 # jiraline
 Command Line Inteface for JIRA
 
-> The aim of the project is to make developers
-> work with Jira faster. For those who work in the
-> terminal and don`t want to break workflow to
-> maintain Jira.
->
-> Forget GUI, use jiraline!
->
+ The aim of the project is to make developers
+ work with Jira faster. For those who work in the
+ terminal and don`t want to break workflow to
+ maintain Jira.
+
+## Forget GUI, use jiraline!
+
 
 ----
 # Quick start
 
-In this section most common operations will be shown. Let`s start and see how you can comment an issue.
+In this section most common operations will be shown. Let`s start and see how to comment an issue.
 Here is syntax:
 
     jiraline comment -m "Message text" ISSUE_NAME
@@ -20,6 +20,11 @@ Here is syntax:
 For example:
 
     jiraline comment -m "This is comment made from my terminal" JL-42
+
+Next step will be assigning an issue to user:
+
+    jiraline assing -u USER_NAME ISSUE_NAME
+
 
 ----
 # Settings
