@@ -91,6 +91,8 @@ def commandIssue(ui):
             print("The issue does not exist or the user does not have permission to view it")
         elif r.status_code == 400:
             print("There is no transition specified.")
+        elif r.status_code == 500:
+            print("500 Internal server error")
     else:
         exit(1)
 
