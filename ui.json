@@ -47,6 +47,14 @@
                         "help": "list transitions",
                         "arguments" : []
                     }
+                ],
+                "local": [
+                    {
+                        "long":"do",
+                        "short": "d",
+                        "help": "do transition",
+                        "arguments" : ["transition:str"]
+                    }
                 ]
             },
             "operands":{

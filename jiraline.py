@@ -77,7 +77,20 @@ def commandIssue(ui):
         elif r.status_code == 200:
             response = json.loads(r.text)
             for t in response["transitions"]:
-                print(t["name"])
+                print(t["name"],t["id"])
+    elif "-d":
+        transition = {
+            "transition":{
+                "id":ui.get("-d")
+            }
+        }
+        r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings["domain"],issue_name),
+                          json=transition,
+                          auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
+        if r.status_code == 404:
+            print("The issue does not exist or the user does not have permission to view it")
+        elif r.status_code == 400:
+            print("There is no transition specified.")
     else:
         exit(1)
 
