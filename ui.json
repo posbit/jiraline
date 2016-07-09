@@ -37,6 +37,21 @@
             "operands":{
                 "no" : [1,1]
             }
+        },
+        "issue" : {
+            "options": {
+                "local": [
+                    {
+                        "long":"transitions",
+                        "short": "t",
+                        "help": "list transitions",
+                        "arguments" : []
+                    }
+                ]
+            },
+            "operands":{
+                "no" : [1,1]
+            }
         }
     }
 }
