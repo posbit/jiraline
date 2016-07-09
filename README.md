@@ -10,7 +10,18 @@ Command Line Inteface for JIRA
 >
 
 ----
+# Quick start
 
+In this section most common operations will be shown. Let`s start and see how you can comment an issue.
+Here is syntax:
+
+    jiraline comment -m "Message text" ISSUE_NAME
+
+For example:
+
+    jiraline comment -m "This is comment made from my terminal" JL-42
+
+----
 # Settings
 
 In file `~/.jiraline` put the following contents:
