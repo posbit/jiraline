@@ -1,3 +1,0 @@
-# Goals and mission
-
-# Features
