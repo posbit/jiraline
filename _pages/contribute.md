@@ -14,6 +14,9 @@ Help us improving Jiraline. We are at the beginning of our development and there
 * package builds
 * CVS integrations
 
+Project is hosted on GitHub. Please put all issues and pull requests there.
+But, if you got any ideas, questions or just want to talk please do not hesitate and write email or contact us using social media.
+
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge
