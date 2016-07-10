@@ -1,13 +1,17 @@
 ---
-permalink : /quick-start/
+title: "Quick-start Guide"
+permalink: /quick-start/
 ---
+
+{% include base_path %}
 
 # Quick start
 
 In this section most common operations will be shown. Let`s start and see how to comment an issue.
 Here is syntax:
-
-    jiraline comment -m "Message text" ISSUE_NAME
+```bash
+jiraline comment -m "Message text" ISSUE_NAME
+```
 
 For example:
 
