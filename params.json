@@ -1,6 +1,0 @@
-{
-  "name": "Jiraline",
-  "tagline": "Command Line Inteface for JIRA",
-  "body": "# jiraline\r\nCommand Line Inteface for JIRA\r\n\r\n----\r\n\r\n# Settings\r\n\r\nIn file `~/.jiraline` put the following contents:\r\n\r\n\r\n```\r\n{\r\n    \"domain\": <your JIRA cloud domain>,\r\n    \"credentials\": {\r\n        \"user\": <your user name>,\r\n        \"password\": <your password>\r\n     }\r\n}\r\n```\r\n\r\nSample valid config that will let you connect to `example.atlassian.net`:\r\n\r\n```\r\n{\r\n    \"domain\": \"example\",\r\n    \"credentials\": {\r\n        \"user\": \"username\"\r\n        \"password\": \"$ecretP4s$w0rd1\"\r\n     }\r\n}\r\n```\r\n",
-  "note": "Don't delete this file! It's used internally to help with page regeneration."
-}
