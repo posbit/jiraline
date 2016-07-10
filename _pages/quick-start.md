@@ -9,6 +9,7 @@ permalink: /quick-start/
 
 In this section most common operations will be shown. Let`s start and see how to comment an issue.
 Here is syntax:
+
 ```bash
 jiraline comment -m "Message text" ISSUE_NAME
 ```
