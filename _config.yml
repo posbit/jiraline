@@ -11,8 +11,8 @@ title                    : "Jiraline"
 title_separator          : "|"
 name                     : "Michał Górski"
 description              : "Command line interface for JIRA software. Improves developer workflow."
-url                      : "https://posbit.github.io"
-baseurl                  : "/jiraline"
+url                      : "https://posbit.github.io/jiraline"
+baseurl                  : ""
 gh_repo                  :
 teaser                   : # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"
 breadcrumbs              :  true
