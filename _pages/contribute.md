@@ -1,6 +1,6 @@
 ---
 title : "Contribute"
-pemalink : /contribute/
+permalink : /contribute/
 ---
 
 {% include base_path %}
