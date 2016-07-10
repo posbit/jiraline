@@ -5,8 +5,6 @@ permalink: /quick-start/
 
 {% include base_path %}
 
-# Quick start
-
 In this section most common operations will be shown. Let`s start and see how to comment an issue.
 Here is syntax:
 
