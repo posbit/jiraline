@@ -1,7 +1,7 @@
 # main links links
 main:
   - title: "Quick-start"
-    url: /docs/quick-start/
+    url: /quick-start/
   - title: "Docs"
     url: /docs/
   - title: "Contribute"
