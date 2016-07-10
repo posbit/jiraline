@@ -1,7 +1,10 @@
 # main links links
 main:
-  - title: "Sample Navigation Link"
-    url: https://mmistakes.github.io/minimal-mistakes/docs/navigation/
-
-  - title: "Sample Navigation Link 2"
-    url: /
+  - title: "Quick-start"
+    url: /docs/quick-start/
+  - title: "Docs"
+    url: /docs/
+  - title: "Contribute"
+    url: /contribute
+  - title: "Communication"
+    url: /communication
