@@ -11,8 +11,8 @@ title                    : "Jiraline"
 title_separator          : "|"
 name                     : "Michał Górski"
 description              : "Command line interface for JIRA software. Improves developer workflow."
-url                      : # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
-baseurl                  : # the subpath of your site, e.g. "/blog"
+url                      : "https://posbit.github.io"
+baseurl                  : "/jiraline"
 gh_repo                  :
 teaser                   : # filename of teaser fallback teaser image placed in /images/, .e.g. "500x300.png"
 breadcrumbs              :  true
