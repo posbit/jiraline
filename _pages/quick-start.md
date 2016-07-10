@@ -1,5 +1,5 @@
 ---
-permalink : /quickstart/
+permalink : /quick-start/
 ---
 
 ----
