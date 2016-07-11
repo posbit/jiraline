@@ -97,6 +97,7 @@ author:
 include:
   - .htaccess
   - _pages
+  - _docs
 exclude:
   - "*.sublime-project"
   - "*.sublime-workspace"
@@ -167,7 +168,19 @@ defaults:
     values:
       layout: single
       author_profile: false
-
+  # _docs
+  - scope:
+      path: ""
+      type : pages
+    values:
+      layout: single
+      author_profile: false
+      read_time: false
+      author_profile: false
+      share: false
+      comments: false
+      sidebar:
+        nav: "docs"
 # Plugins
 gems:
   - jekyll-paginate
