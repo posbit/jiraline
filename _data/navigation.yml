@@ -8,3 +8,39 @@ main:
     url: /contribute/
   - title: "Communication"
     url: /communication/
+
+# documentation links
+docs:
+  - title: Getting Started
+    children:
+      - title: "Quick-Start Guide"
+        url: /docs/quick-start/
+      - title: "Requirements"
+        url: /docs/requirements/
+      - title: "Installation"
+        url: /docs/installation/
+      - title: "Settings"
+        url: /docs/settings/
+
+  - title: User Guide
+    children:
+      - title: "Comments"
+        url: /docs/Comments/
+      - title: "Assign"
+        url: /docs/assign/
+      - title: "Transitions"
+        url: /docs/transitions/
+      - title: "Command list"
+        children:
+        - title: "assign"
+          url: /docs/command-list/assign/
+        - title: "comment"
+          url: /docs/command-list/comment/
+        - title: "issue"
+          url: /docs/command-list/issue/
+
+  - title: Developer Guide
+    children:
+      - title: "How to make a new feature?"
+        url: /docs/how-to-make-a-feature/
+
