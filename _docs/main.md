@@ -10,3 +10,6 @@ First section will describe how to start working with Jiraline, make a setup and
 Second section is about using Jiraline. You will find topic sections and list of all commands at the end.
 
 Last section is dedicated for contributors. Look how easy is to add a new feature to Jiraline!
+
+**Notice** If you find something unclear or not up-to-date please let us now. Thanks!
+{: .notice--info}
