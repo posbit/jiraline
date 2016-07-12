@@ -25,7 +25,7 @@ docs:
   - title: User Guide
     children:
       - title: "Comments"
-        url: /docs/Comments/
+        url: /docs/comments/
       - title: "Assign"
         url: /docs/assign/
       - title: "Transitions"
