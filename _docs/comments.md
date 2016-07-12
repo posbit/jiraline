@@ -1,6 +1,6 @@
 ---
 title : "Comments"
-permalink : "/doc/comments/"
+permalink : "/docs/comments/"
 ---
 
 This section shows Jiraline comment syntax.
