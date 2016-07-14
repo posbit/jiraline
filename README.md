@@ -1,4 +1,7 @@
 # jiraline
+
+Official website: https://posbit.github.io/jiraline/
+
 Command Line Inteface for JIRA
 
  The aim of the project is to make developers
