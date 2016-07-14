@@ -1,6 +1,6 @@
 # jiraline
 
-Official website: https://posbit.github.io/jiraline/
+Official website: jiraline.org
 
 Command Line Inteface for JIRA
 
