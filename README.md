@@ -1,6 +1,6 @@
 # jiraline
 
-Official website: jiraline.org
+Official website: http://jiraline.org
 
 Command Line Inteface for JIRA
 
