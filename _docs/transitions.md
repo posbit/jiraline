@@ -5,7 +5,7 @@ permalink : "/docs/transitions/"
 
 While working with issue you do a transition and change state of it. Possible transitions depens on present state of the issue. To list possible transitions use below:
 
-```bash⎈
+```bash
 jiraline issue -t ISSUE_NAME
 ```
 
@@ -30,10 +30,13 @@ jiraline issue -t JL-42
 ```
 
 All rigth, let`s do the transtion now. Look at the syntax:
+
 ```bash
 jiraline issue -d TRANSITION_ID ISSUE_NAME
 ```
+
 or
+
 ```bash
 jiraline issue --do TRANSITION_ID ISSUE_NAME
 ```
