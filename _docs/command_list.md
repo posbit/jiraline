@@ -13,7 +13,7 @@ jiraline assign -[u] <ISSUE_ID>
 
 Options:
 
-* u (-- user name). After option you have to type user name to who issue will be assigned to
+* u (`--user`). After option you have to type user name to who issue will be assigned to
 
 **comment**
 
