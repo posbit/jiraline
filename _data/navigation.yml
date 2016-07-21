@@ -31,13 +31,8 @@ docs:
       - title: "Transitions"
         url: /docs/transitions/
       - title: "Command list"
-        children:
-        - title: "assign"
-          url: /docs/command-list/assign/
-        - title: "comment"
-          url: /docs/command-list/comment/
-        - title: "issue"
-          url: /docs/command-list/issue/
+        url: "/docs/command_list/"
+
 
   - title: Developer Guide
     children:
