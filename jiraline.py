@@ -141,7 +141,7 @@ def commandSearch(ui):
         print('{:<7} | {:<30} | {:<20}'.format('Key','Summary','Assignee'))
         print('-' * 40)
         for i in response["issues"]:
-            print('{:<.7} | {:<.30} | {:<.20}'.format(i["key"],i["fields"]["summary"],i["fields"]["assignee"]["displayName"]))
+            print('{:<7} | {:<30} | {:<20}'.format(i["key"],i["fields"]["summary"],i["fields"]["assignee"]["displayName"]))
 
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
