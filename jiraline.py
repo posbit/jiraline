@@ -114,6 +114,31 @@ def commandIssue(ui):
     else:
         exit(1)
 
+def commandSearch(ui):
+    request_content = {
+        "jql": "",
+        "startAt": 0,
+        "maxResults": 15,
+        "fields": [
+            "summary",
+            "status",
+            "assignee"
+        ],
+        "fieldsByKeys": False
+    }
+    if "-p" in ui:
+        request_content["jql"] = request_content["jql"] + ' project = {}'.format(ui.get("-p"))
+    if "-a" in ui:
+        request_content["jql"] = request_content["jql"] + ' assignee = {}'.format(ui.get("-a"))
+
+    r = requests.get('https://{}.atlassian.net/rest/api/2/search'.format(settings["domain"]),
+                      params=request_content,
+                      auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
+    if r.status_code == 200:
+        response = json.loads(r.text)
+        for i in response["issues"]:
+            print('Summary: {}'.format(i["fields"]["summary"]))
+
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
 
@@ -143,4 +168,5 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandComment,    # second: pass command handling functions
     commandAssign,
     commandIssue,
+    commandSearch,
 )
