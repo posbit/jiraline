@@ -9,6 +9,27 @@
         ]
     },
     "commands":{
+        "search":{
+            "options":{
+                "local" : [
+                    {
+                        "long":"assignee",
+                        "short": "a",
+                        "help": "assignee name",
+                        "arguments" : ["assignee:str"]
+                    },
+                    {
+                        "long":"project",
+                        "short": "p",
+                        "help": "project identifier",
+                        "arguments" : ["project:str"]
+                    }
+                ]
+            },
+            "operands":{
+                "no" : []
+            }
+        },
         "comment" : {
             "options": {
                 "local": [
