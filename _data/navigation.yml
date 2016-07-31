@@ -32,6 +32,8 @@ docs:
         url: /docs/assign/
       - title: "Transitions"
         url: /docs/transitions/
+      - title: "Search"
+        url: /docs/search/
       - title: "Command list"
         url: "/docs/command_list/"
 
