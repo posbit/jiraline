@@ -78,7 +78,7 @@ def commandIssue(ui):
             response = json.loads(r.text)
             for t in response["transitions"]:
                 print(t["name"],t["id"])
-    elif "-d":
+    elif "-d" in ui:
         transition = {
             "transition":{
                 "id":ui.get("-d")
@@ -93,6 +93,18 @@ def commandIssue(ui):
             print("There is no transition specified.")
         elif r.status_code == 500:
             print("500 Internal server error")
+    elif "-s" in ui:
+        request_content = {
+            "fields" : "summary,description,comment"
+        }
+        r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}'.format(settings["domain"],issue_name),
+                          params=request_content,
+                          auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
+        if r.status_code == 404:
+            print("The requested issue is not found or the user does not have permission to view it.")
+        elif r.status_code == 200:
+            response = json.loads(r.text)
+            print('{}  {}'.format(response["key"],response["fields"]["summary"]))
     else:
         exit(1)
 
