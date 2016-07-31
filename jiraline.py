@@ -122,7 +122,10 @@ def commandSearch(ui):
         "fields": [
             "summary",
             "status",
-            "assignee"
+            "assignee",
+            "status",
+            "created",
+            "status"
         ],
         "fieldsByKeys": False
     }
@@ -138,10 +141,10 @@ def commandSearch(ui):
                       auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
     if r.status_code == 200:
         response = json.loads(r.text)
-        print('{:<7} | {:<30} | {:<20}'.format('Key','Summary','Assignee'))
-        print('-' * 40)
+        print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
+        print('-' * 130)
         for i in response["issues"]:
-            print('{:<7} | {:<30} | {:<20}'.format(i["key"],i["fields"]["summary"],i["fields"]["assignee"]["displayName"]))
+            print('{:<.7} | {:<50.50} | {:<20.20} | {:<19.19} | {:<20.20}'.format(i["key"],i["fields"]["summary"],i["fields"]["assignee"]["displayName"],i["fields"]["created"],i["fields"]["status"]["name"]))
 
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
