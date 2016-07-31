@@ -126,18 +126,22 @@ def commandSearch(ui):
         ],
         "fieldsByKeys": False
     }
+    conditions = []
     if "-p" in ui:
-        request_content["jql"] = request_content["jql"] + ' project = {}'.format(ui.get("-p"))
+        conditions.append('project = {}'.format(ui.get("-p")))
     if "-a" in ui:
-        request_content["jql"] = request_content["jql"] + ' assignee = {}'.format(ui.get("-a"))
+        conditions.append('assignee = {}'.format(ui.get("-a")))
 
+    request_content["jql"] = " AND ".join(conditions)
     r = requests.get('https://{}.atlassian.net/rest/api/2/search'.format(settings["domain"]),
                       params=request_content,
                       auth=(settings["credentials"]["user"],settings["credentials"]["password"]))
     if r.status_code == 200:
         response = json.loads(r.text)
+        print('{:<7} | {:<30} | {:<20}'.format('Key','Summary','Assignee'))
+        print('-' * 40)
         for i in response["issues"]:
-            print('Summary: {}'.format(i["fields"]["summary"]))
+            print('{:<7} | {:<30} | {:<20}'.format(i["key"],i["fields"]["summary"],i["fields"]["assignee"]["displayName"]))
 
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
