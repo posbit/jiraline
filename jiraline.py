@@ -105,6 +105,7 @@ def commandIssue(ui):
         elif r.status_code == 200:
             response = json.loads(r.text)
             print('{}  {}'.format(response["key"],response["fields"]["summary"]))
+            print('Description:\n{}'.format(response["fields"]["description"]))
     else:
         exit(1)
 
