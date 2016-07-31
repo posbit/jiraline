@@ -23,6 +23,18 @@
                         "short": "p",
                         "help": "project identifier",
                         "arguments" : ["project:str"]
+                    },
+                    {
+                        "long":"status",
+                        "short": "s",
+                        "help": "status identifier",
+                        "arguments" : ["status:str"]
+                    },
+                    {
+                        "long":"jql",
+                        "short": "j",
+                        "help": "JQL query",
+                        "arguments" : ["jql:str"]
                     }
                 ]
             },
