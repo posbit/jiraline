@@ -3,7 +3,7 @@ title : "Transitions"
 permalink : "/docs/transitions/"
 ---
 
-While working with issue you do a transition and change state of it. Possible transitions depens on present state of the issue. To list possible transitions use below:
+While working with issue you do a transition and change state of it. Possible transitions depends on present state of the issue. To list possible transitions use below:
 
 ```bash
 jiraline issue -t ISSUE_NAME
