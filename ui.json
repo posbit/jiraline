@@ -55,6 +55,14 @@
                         "help": "do transition",
                         "arguments" : ["transition:str"]
                     }
+                ],
+                "local": [
+                    {
+                        "long":"show",
+                        "short": "s",
+                        "help": "show issue details",
+                        "arguments" : []
+                    }
                 ]
             },
             "operands":{
