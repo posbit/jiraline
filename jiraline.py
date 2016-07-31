@@ -134,6 +134,10 @@ def commandSearch(ui):
         conditions.append('project = {}'.format(ui.get("-p")))
     if "-a" in ui:
         conditions.append('assignee = {}'.format(ui.get("-a")))
+    if "-s" in ui:
+        conditions.append('status = {}'.format(ui.get("-s")))
+    if "-j" in ui:
+        conditions.append('{}'.format(ui.get("-j")))
 
     request_content["jql"] = " AND ".join(conditions)
     r = requests.get('https://{}.atlassian.net/rest/api/2/search'.format(settings["domain"]),
