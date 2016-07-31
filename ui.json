@@ -46,21 +46,17 @@
                         "short": "t",
                         "help": "list transitions",
                         "arguments" : []
-                    }
-                ],
-                "local": [
+                    },
                     {
                         "long":"do",
                         "short": "d",
                         "help": "do transition",
                         "arguments" : ["transition:str"]
-                    }
-                ],
-                "local": [
+                    },
                     {
                         "long":"show",
                         "short": "s",
-                        "help": "show issue details",
+                        "help": "show details",
                         "arguments" : []
                     }
                 ]
