@@ -138,6 +138,8 @@ def commandSearch(ui):
         conditions.append('status = {}'.format(ui.get("-s")))
     if "-j" in ui:
         conditions.append('{}'.format(ui.get("-j")))
+    if "-n" in ui:
+        request_content["maxResults"] = ui.get("-n")
 
     request_content["jql"] = " AND ".join(conditions)
     r = requests.get('https://{}.atlassian.net/rest/api/2/search'.format(settings["domain"]),

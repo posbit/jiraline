@@ -35,6 +35,12 @@
                         "short": "j",
                         "help": "JQL query",
                         "arguments" : ["jql:str"]
+                    },
+                    {
+                        "long":"number",
+                        "short": "n",
+                        "help": "number of results to be shown",
+                        "arguments" : ["number:int"]
                     }
                 ]
             },
