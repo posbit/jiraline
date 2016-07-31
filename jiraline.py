@@ -105,7 +105,12 @@ def commandIssue(ui):
         elif r.status_code == 200:
             response = json.loads(r.text)
             print('{} | {} | Created: {}'.format(response["key"],response["fields"]["summary"],response["fields"]["created"]))
-            print('Description:\n{}'.format(response["fields"]["description"]))
+            print('\nDescription:\n{}'.format(response["fields"]["description"]))
+            print("\nComments:")
+            for c in response["fields"]["comment"]["comments"]:
+                print('----------------------------------')
+                print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
+                print('{}'.format(c["body"]))
     else:
         exit(1)
 
