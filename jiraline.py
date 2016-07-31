@@ -7,8 +7,10 @@ import os
 import requests
 import clap
 
+filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
+
 model = {}
-with open('./ui.json', 'r') as ifstream: model = json.loads(ifstream.read())
+with open(filename_ui, 'r') as ifstream: model = json.loads(ifstream.read())
 args = list(clap.formatter.Formatter(sys.argv[1:]).format())
 command = clap.builder.Builder(model).insertHelpCommand().build().get()
 parser = clap.parser.Parser(command).feed(args)
