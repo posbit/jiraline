@@ -52,6 +52,12 @@
                         "short": "d",
                         "help": "do transition",
                         "arguments" : ["transition:str"]
+                    },
+                    {
+                        "long":"show",
+                        "short": "s",
+                        "help": "show details",
+                        "arguments" : []
                     }
 
                 ]
