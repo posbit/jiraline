@@ -95,7 +95,7 @@ def commandIssue(ui):
             print("500 Internal server error")
     elif "-s" in ui:
         request_content = {
-            "fields" : "summary,description,comment"
+            "fields" : "summary,description,comment,created"
         }
         r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}'.format(settings["domain"],issue_name),
                           params=request_content,
@@ -104,7 +104,7 @@ def commandIssue(ui):
             print("The requested issue is not found or the user does not have permission to view it.")
         elif r.status_code == 200:
             response = json.loads(r.text)
-            print('{}  {}'.format(response["key"],response["fields"]["summary"]))
+            print('{} | {} | Created: {}'.format(response["key"],response["fields"]["summary"],response["fields"]["created"]))
             print('Description:\n{}'.format(response["fields"]["description"]))
     else:
         exit(1)
