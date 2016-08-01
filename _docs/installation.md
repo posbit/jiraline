@@ -3,7 +3,7 @@ title : "Installation"
 permalink : "/docs/installation/"
 ---
 
-After installing all dependencies (more in section Requirements) just type:
+After installing all dependencies (more in section Requirements) and cloning reposiory just type (inside Jiraline repo folder):
 
 ```bash
 make install
