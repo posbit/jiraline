@@ -29,7 +29,8 @@
 >
   {% if page.header.overlay_color or page.header.overlay_image %}
     <div class="wrapper">
-      <h1 class="page__title" itemprop="headline">
+      <div class="desc">
+        <h1 class="page__title" itemprop="headline">
         {% if paginator %}
           {{ site.title }}{% unless paginator.page == 1 %} {{ site.data.ui-text[site.locale].page }} {{ paginator.page }}{% endunless %}
         {% else %}
@@ -37,14 +38,15 @@
         {% endif %}
       </h1>
       {% if page.excerpt %}
-        <div class="page__lead">{{ page.excerpt | markdownify | remove: "<p>" | remove: "</p>" }}</div>
+        <p class="page__lead">{{ page.excerpt | markdownify | remove: "<p>" | remove: "</p>" }}</p>
       {% endif %}
       {% if site.read_time and page.read_time %}
-        <div class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> {% include read-time.html %}</div>
+        <p class="page__meta"><i class="fa fa-clock-o" aria-hidden="true"></i> {% include read-time.html %}</p>
       {% endif %}
       {% if page.header.cta_url %}
-        <div><a href="{{ cta_path }}" class="btn btn--light-outline btn--large">{{ page.header.cta_label | default: site.data.ui-text[site.locale].more_label }}</a></div>
+        <p><a href="{{ cta_path }}" class="btn btn--light-outline btn--large">{{ page.header.cta_label | default: site.data.ui-text[site.locale].more_label }}</a></p>
       {% endif %}
+        </div>
         <div class="logo-image"><img src="https://posbit.github.io/jiraline/images/logo.png"></div>
     </div>
   {% else %}
