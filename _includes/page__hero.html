@@ -45,6 +45,7 @@
       {% if page.header.cta_url %}
         <p><a href="{{ cta_path }}" class="btn btn--light-outline btn--large">{{ page.header.cta_label | default: site.data.ui-text[site.locale].more_label }}</a></p>
       {% endif %}
+        <div class="logo-image"><img src="https://posbit.github.io/jiraline/images/logo.png"></div>
     </div>
   {% else %}
     <img src="{{ img_path }}" alt="{{ page.title }}" class="page__hero-image">
