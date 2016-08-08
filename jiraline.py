@@ -56,9 +56,21 @@ if clap.helper.HelpRunner(ui=ui, program=sys.argv[0]).adjust(options=['-h', '--h
 
 ui = ui.down()
 
-settings = {}
-if os.path.isfile(os.path.expanduser("~/.jiraline")):
-    with open(os.path.expanduser("~/.jiraline")) as ifstream: settings = json.loads(ifstream.read())
+def loadSettings():
+    settings = {}
+    if not os.path.isfile(os.path.expanduser("~/.jiraline")):
+        return settings
+    try:
+        with open(os.path.expanduser("~/.jiraline")) as ifstream:
+            settings = json.loads(ifstream.read())
+    except json.decoder.JSONDecodeError as e:
+        print('error: invalid settings format: {}'.format(e))
+        exit(1)
+    except Exception as e:
+        print('error: failed loading settings: {}'.format(e))
+        exit(1)
+    return settings
+settings = loadSettings()
 
 def commandComment(ui):
     issue_name = ui.operands()[0]
