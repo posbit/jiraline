@@ -24,6 +24,29 @@ except clap.errors.UnrecognizedOptionError as e:
     print('unrecognized option found: {0}'.format(e))
 except clap.errors.UIDesignError as e:
     print('misdesigned interface: {0}'.format(e))
+except clap.errors.MissingArgumentError as e:
+    print('missing argument for option: {0}'.format(e))
+    fail = True
+except clap.errors.ConflictingOptionsError as e:
+    print('conflicting options found: {0}'.format(e))
+    fail = True
+except clap.errors.RequiredOptionNotFoundError as e:
+    fail = True
+    print('required option not found: {0}'.format(e))
+except clap.errors.InvalidOperandRangeError as e:
+    print('invalid number of operands: {0}'.format(e))
+    fail = True
+except clap.errors.UIDesignError as e:
+    print('UI has design error: {0}'.format(e))
+    fail = True
+except clap.errors.AmbiguousCommandError as e:
+    name, candidates = str(e).split(': ')
+    print("ambiguous shortened command name: '{0}', candidates are: {1}".format(name, candidates))
+    print("note: if this is a false positive use '--' operand separator")
+    fail = True
+except Exception as e:
+    print('error: unhandled exception: {0}: {1}'.format(str(type(e))[8:-2], e))
+    fail = True
 finally:
     if fail: exit(1)
     ui = parser.parse().ui().finalise()
@@ -36,7 +59,7 @@ ui = ui.down()
 settings = {}
 if os.path.isfile(os.path.expanduser("~/.jiraline")):
     with open(os.path.expanduser("~/.jiraline")) as ifstream: settings = json.loads(ifstream.read())
-    
+
 def commandComment(ui):
     issue_name = ui.operands()[0]
     message = ""
