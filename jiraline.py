@@ -251,8 +251,15 @@ def commandIssue(ui):
         r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
         if r.status_code == 200:
             response = json.loads(r.text)
-            displayBasicInformation(response)
-            displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
+            if '--field' not in ui:
+                displayBasicInformation(response)
+                displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
+            else:
+                fields = response.get('fields', {})
+                for key in selected_fields:
+                    if key == 'comment': continue
+                    print('{} {}'.format(key, fields.get(key, '<undefined or invalid>').strip()))
+                displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
         elif r.status_code == 404:
             print("error: the requested issue is not found or the user does not have permission to view it.")
             exit(1)
