@@ -184,41 +184,48 @@ def commandAssign(ui):
         print("Either the issue or the user does not exist.")
 
 def commandIssue(ui):
+    ui = ui.down()
     issue_name = ui.operands()[0]
-    if "-t" in ui:
-        r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
-                      auth=settings.credentials())
-        if r.status_code == 404:
-            print("The requested issue is not found or the user does not have permission to view it.")
-        elif r.status_code == 200:
-            response = json.loads(r.text)
-            for t in response["transitions"]:
-                print(t["name"],t["id"])
-    elif "-d" in ui:
-        transition = {
-            "transition":{
-                "id":ui.get("-d")
+    if str(ui) == 'transition':
+        if '--to' in ui:
+            transition = {
+                "transition":{
+                    "id": ui.get("-d")
+                }
             }
-        }
-        r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
-                          json=transition,
+            r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
+                              json=transition,
+                              auth=settings.credentials())
+            if r.status_code == 404:
+                print("error: the issue does not exist or the user does not have permission to view it")
+                exit(1)
+            elif r.status_code == 400:
+                print("error: there is no transition specified")
+                exit(1)
+            elif r.status_code == 500:
+                print("error: 500 Internal server error")
+                exit(1)
+        else:
+            r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
                           auth=settings.credentials())
-        if r.status_code == 404:
-            print("The issue does not exist or the user does not have permission to view it")
-        elif r.status_code == 400:
-            print("There is no transition specified.")
-        elif r.status_code == 500:
-            print("500 Internal server error")
-    elif "-s" in ui:
+            if r.status_code == 200:
+                response = json.loads(r.text)
+                for t in response["transitions"]:
+                    print(t["name"],t["id"])
+            elif r.status_code == 404:
+                print("error: the requested issue is not found or the user does not have permission to view it")
+                exit(1)
+            else:
+                print('error: HTTP {}'.format(r.status_code))
+                exit(1)
+    elif str(ui) in ('show', 'issue',):
         request_content = {
             "fields" : "summary,description,comment,created"
         }
         r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}'.format(settings.get('domain'), issue_name),
                           params=request_content,
                           auth=settings.credentials())
-        if r.status_code == 404:
-            print("The requested issue is not found or the user does not have permission to view it.")
-        elif r.status_code == 200:
+        if r.status_code == 200:
             response = json.loads(r.text)
             print('{} | {} | Created: {}'.format(response["key"],response["fields"]["summary"],response["fields"]["created"]))
             print('\nDescription:\n{}'.format(response["fields"]["description"]))
@@ -227,8 +234,12 @@ def commandIssue(ui):
                 print('----------------------------------')
                 print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
                 print('{}'.format(c["body"]))
-    else:
-        exit(1)
+        elif r.status_code == 404:
+            print("error: the requested issue is not found or the user does not have permission to view it.")
+            exit(1)
+        else:
+            print('error: HTTP {}'.format(r.status_code))
+            exit(1)
 
 def commandSearch(ui):
     request_content = {
@@ -281,6 +292,8 @@ def commandSearch(ui):
                 status_name,
             )
             print(message_line)
+    else:
+        print('error: HTTP {}'.format(r.status_code))
 
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.

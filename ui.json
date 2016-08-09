@@ -78,28 +78,27 @@
             }
         },
         "issue" : {
-            "options": {
-                "local": [
-                    {
-                        "long":"transitions",
-                        "short": "t",
-                        "help": "list transitions",
-                        "arguments" : []
-                    },
-                    {
-                        "long":"do",
-                        "short": "d",
-                        "help": "do transition",
-                        "arguments" : ["transition:str"]
-                    },
-                    {
-                        "long":"show",
-                        "short": "s",
-                        "help": "show details",
-                        "arguments" : []
+            "commands": {
+                "show": {
+                    "operands": {
+                        "no": [1, 1]
                     }
-
-                ]
+                },
+                "transition": {
+                    "options": {
+                        "local": [
+                            {
+                                "long": "to",
+                                "short": "t",
+                                "help": "transition issue to new state",
+                                "arguments": ["transition:str"]
+                            }
+                        ]
+                    },
+                    "operands": {
+                        "no": [1, 1]
+                    }
+                }
             },
             "operands":{
                 "no" : [1,1]
