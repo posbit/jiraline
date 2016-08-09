@@ -1,4 +1,25 @@
 {
+    "doc": {
+        "help": "Jiraline - Jira commandline client",
+        "usage": [
+            "--help",
+            "--version",
+            "jiraline <issue-name>",
+            "jiraline show <issue-name>",
+            "jiraline comment -m <message> <issue-name>",
+            "jiraline assign -u <username> <issue-name>"
+        ],
+        "examples": [
+            {
+                "line": "jiraline issue show --field summary JL-42",
+                "desc": "show 'summary' field of issue JL-42"
+            },
+            {
+                "line": "jiraline issue transition --names JL-42",
+                "desc": "show names of transitions available for JL-42"
+            }
+        ]
+    },
     "options": {
         "global": [
             {
@@ -10,6 +31,9 @@
     },
     "commands":{
         "search":{
+            "doc": {
+                "help": "List issues and apply search criteria to listings"
+            },
             "options":{
                 "local" : [
                     {
@@ -49,6 +73,9 @@
             }
         },
         "comment" : {
+            "doc": {
+                "help": "Comment issues"
+            },
             "options": {
                 "local": [
                     {
@@ -63,6 +90,9 @@
             }
         },
         "assign" : {
+            "doc": {
+                "help": "Assign issues"
+            },
             "options": {
                 "local": [
                     {
@@ -78,8 +108,14 @@
             }
         },
         "issue" : {
+            "doc": {
+                "help": "Basic issue management and information retrieval"
+            },
             "commands": {
                 "show": {
+                    "doc": {
+                        "help": "Display information about issues"
+                    },
                     "options": {
                         "local": [
                             {
@@ -96,6 +132,12 @@
                     }
                 },
                 "transition": {
+                    "doc": {
+                        "help": "Transition issues to new states",
+                        "usage": [
+                            "issue transition --to <state> <issue-name>"
+                        ]
+                    },
                     "options": {
                         "local": [
                             {
