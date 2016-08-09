@@ -137,7 +137,7 @@ def commandComment(ui):
     comment={"body":message}
     r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/comment'.format(settings.get('domain'), issue_name),
                       json=comment,
-                      auth=(settings.get('credentials', 'user'), settings.get('credentials', 'password')))
+                      auth=settings.credentials())
     if r.status_code == 400:
         print('The input is invalid (e.g. missing required fields, invalid values, and so forth).')
 
@@ -151,7 +151,7 @@ def commandAssign(ui):
     assing={"name":user_name}
     r = requests.put('https://{}.atlassian.net/rest/api/2/issue/{}/assignee'.format(settings.get('domain'), issue_name),
                       json=assing,
-                      auth=(settings.get('credentials', 'user'), settings.get('credentials', 'password')))
+                      auth=settings.credentials())
     if r.status_code == 400:
         print('There is a problem with the received user representation.')
     elif r.status_code == 401:
@@ -163,7 +163,7 @@ def commandIssue(ui):
     issue_name = ui.operands()[0]
     if "-t" in ui:
         r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
-                      auth=(settings.get('credentials', 'user'), settings.get('credentials', 'password')))
+                      auth=settings.credentials())
         if r.status_code == 404:
             print("The requested issue is not found or the user does not have permission to view it.")
         elif r.status_code == 200:
@@ -178,7 +178,7 @@ def commandIssue(ui):
         }
         r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
                           json=transition,
-                          auth=(settings.get('credentials', 'user'), settings.get('credentials', 'password')))
+                          auth=settings.credentials())
         if r.status_code == 404:
             print("The issue does not exist or the user does not have permission to view it")
         elif r.status_code == 400:
@@ -191,7 +191,7 @@ def commandIssue(ui):
         }
         r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}'.format(settings.get('domain'), issue_name),
                           params=request_content,
-                          auth=(settings.get('credentials', 'user'), settings.get('credentials', 'password')))
+                          auth=settings.credentials())
         if r.status_code == 404:
             print("The requested issue is not found or the user does not have permission to view it.")
         elif r.status_code == 200:
@@ -236,7 +236,7 @@ def commandSearch(ui):
     request_content["jql"] = " AND ".join(conditions)
     r = requests.get('https://{}.atlassian.net/rest/api/2/search'.format(settings.get('domain')),
                       params=request_content,
-                      auth=(settings.get('credentials', 'user'), settings.get('credentials', 'password')))
+                      auth=settings.credentials())
     if r.status_code == 200:
         response = json.loads(r.text)
         print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
