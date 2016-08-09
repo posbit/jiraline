@@ -149,6 +149,9 @@ class Connection:
     def get(self, url, **kwargs):
         return requests.get(self.url(url), auth=self._auth(), **kwargs)
 
+    def put(self, url, **kwargs):
+        return requests.put(self.url(url), auth=self._auth(), **kwargs)
+
 connection = Connection(settings)
 
 def commandComment(ui):
@@ -169,9 +172,7 @@ def commandAssign(ui):
     issue_name = ui.operands()[0]
     user_name = ui.get('-u')
     assign = {'name': user_name}
-    r = requests.put('https://{}.atlassian.net/rest/api/2/issue/{}/assignee'.format(settings.get('domain'), issue_name),
-                      json=assing,
-                      auth=settings.credentials())
+    r = connection.put('/rest/api/2/issue/{}/assignee'.format(issue_name), json=assign)
     if r.status_code == 400:
         print('There is a problem with the received user representation.')
     elif r.status_code == 401:
