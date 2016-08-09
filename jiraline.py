@@ -227,11 +227,14 @@ def commandIssue(ui):
             fields = response.get('fields', {})
             print('{} | {} | Created: {}'.format(response["key"], fields.get('summary', ''), fields.get('created')))
             print('\nDescription:\n{}'.format(fields.get('description')))
-            print("\nComments:")
-            for c in fields.get('comment', {}).get('comments', []):
-                print('----------------------------------')
-                print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
-                print('{}'.format(c["body"]))
+
+            comments = fields.get('comment', {}).get('comments', [])
+            if comments:
+                print("\nComments:")
+                for c in comments:
+                    print('----------------------------------')
+                    print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
+                    print('{}'.format(c["body"]))
         elif r.status_code == 404:
             print("error: the requested issue is not found or the user does not have permission to view it.")
             exit(1)
