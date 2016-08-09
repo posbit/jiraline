@@ -60,6 +60,8 @@ ui = ui.down()
 class Settings:
     def __init__(self):
         self._settings = {}
+        self._username = None
+        self._password = None
 
     # Operator overloads suitable for settings objects.
     def __getitem__(self, key):
@@ -95,6 +97,7 @@ class Settings:
 
     # High-level access API.
     def username(self):
+        if self._username is not None: return self._username
         username = str(self._settings.get('credentials', {}).get('user', '')).strip()
         if not username:
             try:
@@ -102,9 +105,11 @@ class Settings:
             except (EOFError, KeyboardInterrupt) as e:
                 print()
                 exit(1)
+        self._username = username
         return username
 
     def password(self):
+        if self._password is not None: return self._password
         password = str(self._settings.get('credentials', {}).get('user', '')).strip()
         if not password:
             try:
@@ -112,6 +117,7 @@ class Settings:
             except (EOFError, KeyboardInterrupt) as e:
                 print()
                 exit(1)
+        self._password = password
         return password
 
     def credentials(self):
