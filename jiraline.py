@@ -84,6 +84,17 @@ class Settings:
             username = input('username: ')
         return username
 
+    def get(self, *path):
+        value = self._settings
+        for key in path:
+            if key not in value:
+                print('error: key missing from configuration: {}'.format('.'.join(path)))
+                exit(1)
+            value = value[key]
+            if type(key) is not dict:
+                break
+        return value
+
 settings = Settings().load()
 
 def commandComment(ui):
