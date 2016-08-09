@@ -206,8 +206,7 @@ def commandIssue(ui):
                 print("error: 500 Internal server error")
                 exit(1)
         else:
-            r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
-                          auth=settings.credentials())
+            r = connection.get('/rest/api/2/issue/{}/transitions'.format(issue_name))
             if r.status_code == 200:
                 response = json.loads(r.text)
                 for t in response["transitions"]:
