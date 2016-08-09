@@ -26,7 +26,7 @@ For example:
 
 Next step will be assigning an issue to user:
 
-    jiraline assing -u USER_NAME ISSUE_NAME
+    jiraline assign -u USER_NAME ISSUE_NAME
 
 
 ----
