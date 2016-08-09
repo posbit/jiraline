@@ -224,10 +224,11 @@ def commandIssue(ui):
         r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
         if r.status_code == 200:
             response = json.loads(r.text)
-            print('{} | {} | Created: {}'.format(response["key"],response["fields"]["summary"],response["fields"]["created"]))
-            print('\nDescription:\n{}'.format(response["fields"]["description"]))
+            fields = response.get('fields', {})
+            print('{} | {} | Created: {}'.format(response["key"], fields.get('summary', ''), fields.get('created')))
+            print('\nDescription:\n{}'.format(fields.get('description')))
             print("\nComments:")
-            for c in response["fields"]["comment"]["comments"]:
+            for c in fields.get('comment', {}).get('comments', []):
                 print('----------------------------------')
                 print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
                 print('{}'.format(c["body"]))
