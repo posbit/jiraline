@@ -80,6 +80,17 @@
         "issue" : {
             "commands": {
                 "show": {
+                    "options": {
+                        "local": [
+                            {
+                                "long": "field",
+                                "short": "f",
+                                "help": "select field to fetch and display",
+                                "arguments": ["field name:str"],
+                                "plural": true
+                            }
+                        ]
+                    },
                     "operands": {
                         "no": [1, 1]
                     }

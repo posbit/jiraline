@@ -218,8 +218,11 @@ def commandIssue(ui):
                 print('error: HTTP {}'.format(r.status_code))
                 exit(1)
     elif str(ui) in ('show', 'issue',):
+        selected_fields = ('summary', 'description', 'comment', 'created',)
+        if '--field' in ui:
+            selected_fields = [_[0] for _ in ui.get('-f')]
         request_content = {
-            "fields" : "summary,description,comment,created"
+            'fields': ','.join(selected_fields),
         }
         r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
         if r.status_code == 200:
