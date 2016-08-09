@@ -65,6 +65,8 @@ jiraline issue transition --to <transition_id> <issue_name>
 jiraline issue show <issue_name>
 ```
 
+**Shortcut**
+
 If only basic information is needed, a shortcut may be used:
 
 ```
