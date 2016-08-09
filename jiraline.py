@@ -287,6 +287,10 @@ def commandIssue(ui):
             if '--field' not in ui:
                 displayBasicInformation(response)
                 displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
+            elif '--pretty' in ui:
+                print(json.dumps(response.get('fields', {}), indent=ui.get('--pretty')))
+            elif '--raw' in ui:
+                print(json.dumps(response.get('fields', {})))
             else:
                 fields = response.get('fields', {})
                 for i, key in enumerate(real_fields):
