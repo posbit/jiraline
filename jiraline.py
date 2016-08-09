@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import getpass
 import json
 import sys
 import os
@@ -60,9 +61,11 @@ class Settings:
     def __init__(self):
         self._settings = {}
 
+    # Operator overloads suitable for settings objects.
     def __getitem__(self, key):
         return self._settings[key]
 
+    # Maintenance API.
     def load(self):
         self._settings = {}
         if not os.path.isfile(os.path.expanduser("~/.jiraline")):
@@ -78,12 +81,7 @@ class Settings:
             exit(1)
         return self
 
-    def username(self):
-        username = self._settings.get('credentials', {}).get('user', '')
-        if not username:
-            username = input('username: ')
-        return username
-
+    # Low-level access API.
     def get(self, *path):
         value = self._settings
         for key in path:
@@ -94,6 +92,32 @@ class Settings:
             if type(key) is not dict:
                 break
         return value
+
+    # High-level access API.
+    def username(self):
+        username = str(self._settings.get('credentials', {}).get('user', '')).strip()
+        if not username:
+            try:
+                username = input('username: ')
+            except (EOFError, KeyboardInterrupt) as e:
+                print()
+                exit(1)
+        return username
+
+    def password(self):
+        password = str(self._settings.get('credentials', {}).get('user', '')).strip()
+        if not password:
+            try:
+                password = getpass.getpass('password: ')
+            except (EOFError, KeyboardInterrupt) as e:
+                print()
+                exit(1)
+        return password
+
+    def credentials(self):
+        """Suitable for passing as 'auth' parameter to requests functions.
+        """
+        return (self.username(), self.password(),)
 
 settings = Settings().load()
 
