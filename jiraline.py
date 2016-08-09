@@ -78,6 +78,12 @@ class Settings:
             exit(1)
         return self
 
+    def username(self):
+        username = self._settings.get('credentials', {}).get('user', '')
+        if not username:
+            username = input('username: ')
+        return username
+
 settings = Settings().load()
 
 def commandComment(ui):
