@@ -127,6 +127,30 @@ class Settings:
 
 settings = Settings().load()
 
+class Connection:
+    """Class representing connection to Jira cloud instance.
+    Used to simplify queries.
+    """
+    def __init__(self, settings):
+        self._settings = settings
+
+    # Private helper methods.
+    def _server(self):
+        return 'https://{}.atlassian.net'.format(self._settings.get('domain'))
+
+    def _auth(self):
+        return self._settings.credentials()
+
+    # Public helper methods.
+    def url(self, url):
+        return '{server}{url}'.format(server=self._server(), url=url)
+
+    # Public request methods.
+    def get(self, url, **kwargs):
+        return requests.get(self.url(url), auth=self._auth(), **kwargs)
+
+connection = Connection(settings)
+
 def commandComment(ui):
     issue_name = ui.operands()[0]
     message = ""
@@ -234,9 +258,7 @@ def commandSearch(ui):
         request_content["maxResults"] = ui.get("-n")
 
     request_content["jql"] = " AND ".join(conditions)
-    r = requests.get('https://{}.atlassian.net/rest/api/2/search'.format(settings.get('domain')),
-                      params=request_content,
-                      auth=settings.credentials())
+    r = connection.get('/rest/api/2/search', params=request_content)
     if r.status_code == 200:
         response = json.loads(r.text)
         print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
