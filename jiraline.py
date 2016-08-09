@@ -200,8 +200,24 @@ def commandSearch(ui):
         response = json.loads(r.text)
         print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
         print('-' * 130)
-        for i in response["issues"]:
-            print('{:<.7} | {:<50.50} | {:<20.20} | {:<19.19} | {:<20.20}'.format(i["key"],i["fields"]["summary"],i["fields"]["assignee"]["displayName"],i["fields"]["created"],i["fields"]["status"]["name"]))
+        for i in response['issues']:
+            key = i['key']
+            fields = i.get('fields', {})
+            summary = fields.get('summary', '')
+            assignee = fields.get('assignee', {})
+            if assignee is None:
+                assignee = {}
+            assignee_display_name = assignee.get('displayName', '')
+            created = fields.get('created', '')
+            status_name = fields.get('status', {}).get('name', '')
+            message_line = '{:<.7} | {:<50.50} | {:<20.20} | {:<19.19} | {:<20.20}'.format(
+                key,
+                summary,
+                assignee_display_name,
+                created,
+                status_name,
+            )
+            print(message_line)
 
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
