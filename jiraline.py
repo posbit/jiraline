@@ -233,8 +233,16 @@ def commandIssue(ui):
             r = connection.get('/rest/api/2/issue/{}/transitions'.format(issue_name))
             if r.status_code == 200:
                 response = json.loads(r.text)
-                for t in response["transitions"]:
-                    print(t["id"], t["name"])
+                transitions = response.get('transitions', [])
+                if '--ids' in ui:
+                    for t in transitions:
+                        print(t["id"])
+                elif '--names' in ui:
+                    for t in transitions:
+                        print(t["name"])
+                else:
+                    for t in transitions:
+                        print(t["id"], t["name"])
             elif r.status_code == 404:
                 print("error: the requested issue is not found or the user does not have permission to view it")
                 exit(1)

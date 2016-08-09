@@ -103,6 +103,16 @@
                                 "short": "t",
                                 "help": "transition issue to new state",
                                 "arguments": ["transition:str"]
+                            },
+                            {
+                                "long": "ids",
+                                "help": "list only transition IDs",
+                                "conflicts": ["--to", "--names"]
+                            },
+                            {
+                                "long": "names",
+                                "help": "list only transition names",
+                                "conflicts": ["--to", "--ids"]
                             }
                         ]
                     },
