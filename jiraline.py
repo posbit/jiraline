@@ -57,6 +57,26 @@ if clap.helper.HelpRunner(ui=ui, program=sys.argv[0]).adjust(options=['-h', '--h
 
 ui = ui.down()
 
+def obtain(dictionary, *path, error=False, default=None):
+    found = False
+    value = dictionary
+    path_length = len(path)-1
+    for i, key in enumerate(path):
+        if key not in value:
+            if error:
+                raise KeyError('.'.join(path))
+            break
+        value = value[key]
+        if type(value) is not dict and i < path_length:
+            if error:
+                raise KeyError('.'.join(path))
+            break
+        if type(value) is not dict and i == path_length:
+            found = True
+        if i == path_length:
+            found = True
+    return (value if found else default)
+
 class Settings:
     def __init__(self):
         self._settings = {}
@@ -253,9 +273,11 @@ def commandIssue(ui):
                 print('error: HTTP {}'.format(r.status_code))
                 exit(1)
     elif str(ui) in ('show', 'issue',):
-        selected_fields = ('summary', 'description', 'comment', 'created',)
+        real_fields = ('summary', 'description', 'comment', 'created',)
+        selected_fields = []
         if '--field' in ui:
-            selected_fields = [_[0] for _ in ui.get('-f')]
+            real_fields = [_[0] for _ in ui.get('-f')]
+            selected_fields = [_.split('.')[0] for _ in real_fields]
         request_content = {
             'fields': ','.join(selected_fields),
         }
@@ -267,9 +289,9 @@ def commandIssue(ui):
                 displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
             else:
                 fields = response.get('fields', {})
-                for key in selected_fields:
+                for i, key in enumerate(real_fields):
                     if key == 'comment': continue
-                    value = fields.get(key, '')
+                    value = obtain(fields, *key.split('.'))
                     if key == 'assignee':
                         value = stringifyAssignee(value)
                     if value is None:

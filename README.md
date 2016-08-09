@@ -73,6 +73,17 @@ If only basic information is needed, a shortcut may be used:
 jiraline issue <issue_name>
 ```
 
+#### Displaying detailed fields
+
+To access nested fields in Jira responses use dot-separated keys parts:
+
+```
+~]$ jiraline issue show -f assigne JL-42
+assignee = John Doe <email@example.com>
+~]$ jiraline issue show -f assigne.emailAddress JL-42
+assignee.emailAddress = email@example.com
+```
+
 
 ### Built-in help screens
 
