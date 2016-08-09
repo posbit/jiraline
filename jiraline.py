@@ -267,7 +267,7 @@ def commandIssue(ui):
                     if value is None:
                         print('{} (undefined)'.format(key))
                     else:
-                        print('{} = {}'.format(key, value.strip()))
+                        print('{} = {}'.format(key, str(value).strip()))
                 displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
         elif r.status_code == 404:
             print("error: the requested issue is not found or the user does not have permission to view it.")
