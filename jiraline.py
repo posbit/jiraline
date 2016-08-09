@@ -221,9 +221,7 @@ def commandIssue(ui):
         request_content = {
             "fields" : "summary,description,comment,created"
         }
-        r = requests.get('https://{}.atlassian.net/rest/api/2/issue/{}'.format(settings.get('domain'), issue_name),
-                          params=request_content,
-                          auth=settings.credentials())
+        r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
         if r.status_code == 200:
             response = json.loads(r.text)
             print('{} | {} | Created: {}'.format(response["key"],response["fields"]["summary"],response["fields"]["created"]))
