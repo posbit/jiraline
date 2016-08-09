@@ -234,7 +234,7 @@ def commandIssue(ui):
             if r.status_code == 200:
                 response = json.loads(r.text)
                 for t in response["transitions"]:
-                    print(t["name"],t["id"])
+                    print(t["id"], t["name"])
             elif r.status_code == 404:
                 print("error: the requested issue is not found or the user does not have permission to view it")
                 exit(1)
