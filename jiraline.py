@@ -204,6 +204,12 @@ def displayComments(comments):
             print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
             print('{}'.format(c["body"]))
 
+def stringifyAssignee(assignee):
+    return '{} <{}>'.format(
+        assignee.get('displayName', ''),
+        assignee.get('emailAddress', ''),
+    ).strip()
+
 def commandIssue(ui):
     ui = ui.down()
     issue_name = ui.operands()[0]
@@ -264,6 +270,8 @@ def commandIssue(ui):
                 for key in selected_fields:
                     if key == 'comment': continue
                     value = fields.get(key, '')
+                    if key == 'assignee':
+                        value = stringifyAssignee(value)
                     if value is None:
                         print('{} (undefined)'.format(key))
                     else:
