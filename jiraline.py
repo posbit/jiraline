@@ -60,6 +60,9 @@ class Settings:
     def __init__(self):
         self._settings = {}
 
+    def __getitem__(self, key):
+        return self._settings[key]
+
     def load(self):
         self._settings = {}
         if not os.path.isfile(os.path.expanduser("~/.jiraline")):
