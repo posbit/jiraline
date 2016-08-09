@@ -91,7 +91,7 @@ class Settings:
                 print('error: key missing from configuration: {}'.format('.'.join(path)))
                 exit(1)
             value = value[key]
-            if type(key) is not dict:
+            if type(value) is not dict:
                 break
         return value
 
