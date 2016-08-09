@@ -99,7 +99,8 @@
                         "long":"user",
                         "short": "u",
                         "help": "user name",
-                        "arguments" : ["user_name:str"]
+                        "arguments" : ["user_name:str"],
+                        "required": true
                     }
                 ]
             },

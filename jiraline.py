@@ -167,12 +167,8 @@ def commandComment(ui):
 
 def commandAssign(ui):
     issue_name = ui.operands()[0]
-    user_name = ""
-    if "-u" in ui:
-        user_name = ui.get("-u")
-    else:
-        exit(1)
-    assing={"name":user_name}
+    user_name = ui.get('-u')
+    assign = {'name': user_name}
     r = requests.put('https://{}.atlassian.net/rest/api/2/issue/{}/assignee'.format(settings.get('domain'), issue_name),
                       json=assing,
                       auth=settings.credentials())
