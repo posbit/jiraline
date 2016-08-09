@@ -2,31 +2,74 @@
 
 Official website: http://jiraline.org
 
-Command Line Inteface for JIRA
+**Command Line Inteface for JIRA**
 
- The aim of the project is to make developers
- work with Jira faster. For those who work in the
- terminal and don`t want to break workflow to
- maintain Jira.
+The aim of the project is to make developers
+work with Jira faster. For those who work in the
+terminal and don't want to break workflow to
+maintain Jira.
 
 ## Forget GUI, use jiraline!
 
 
 ----
+
 # Quick start
 
-In this section most common operations will be shown. Let`s start and see how to comment an issue.
-Here is syntax:
+This section show how to perform some of the most common Jira
+operations.
 
-    jiraline comment -m "Message text" ISSUE_NAME
+### Commenting
+
+Let's start and see how to comment an issue.
+Here is the syntax:
+
+```
+jiraline comment -m "Message text" <issue_name>
+```
 
 For example:
 
-    jiraline comment -m "This is comment made from my terminal" JL-42
+```
+jiraline comment -m "This is comment made from my terminal" JL-42
+```
+
+
+### Assigning issues
 
 Next step will be assigning an issue to user:
 
-    jiraline assign -u USER_NAME ISSUE_NAME
+```
+jiraline assign -u <user_name> <issue_name>
+```
+
+
+### Transitions
+
+Displaying transitions available for an issue:
+
+```
+jiraline issue transition <issue_name>
+```
+
+Transitioning an issue to a new state:
+
+```
+jiraline issue transition --to <transition_id> <issue_name>
+```
+
+
+### Displaying issues
+
+```
+jiraline issue show <issue_name>
+```
+
+If only basic information is needed, a shortcut may be used:
+
+```
+jiraline issue <issue_name>
+```
 
 
 ----
