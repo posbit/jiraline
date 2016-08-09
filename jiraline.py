@@ -214,7 +214,7 @@ def commandIssue(ui):
         if '--to' in ui:
             transition = {
                 "transition":{
-                    "id": ui.get("-d")
+                    "id": ui.get("-t")
                 }
             }
             r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
