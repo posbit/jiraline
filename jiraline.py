@@ -110,7 +110,7 @@ class Settings:
 
     def password(self):
         if self._password is not None: return self._password
-        password = str(self._settings.get('credentials', {}).get('user', '')).strip()
+        password = str(self._settings.get('credentials', {}).get('password', '')).strip()
         if not password:
             try:
                 password = getpass.getpass('password: ')
