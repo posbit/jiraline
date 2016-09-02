@@ -393,12 +393,10 @@ def commandSlug(ui):
         if '--format' in ui:
             slug_format = ui.get('--format')
         if '--use-format' in ui:
-            print('warning: --use-format is not implemented')
-            #repo_config = getConfig()
-            # slug_format = repo_config.get('slug.format.{0}'.format(ui.get('--use-format')), '')
-            # if not slug_format:
-            #     print('fatal: undefined slug format: {0}'.format(ui.get('--use-format')))
-            #     exit(1)
+            slug_format = settings.get('slug', 'format', ui.get('--use-format'), default=False)
+            if not slug_format:
+                print('fatal: undefined slug format: {0}'.format(ui.get('--use-format')))
+                exit(1)
 
         if slug_format:
             try:
