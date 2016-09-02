@@ -176,7 +176,8 @@
                                 "long": "to",
                                 "short": "t",
                                 "help": "transition issue to new state",
-                                "arguments": ["transition:str"]
+                                "arguments": ["transition:str"],
+                                "plural": true
                             },
                             {
                                 "long": "ids",

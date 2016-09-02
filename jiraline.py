@@ -286,29 +286,33 @@ def stringifyAssignee(assignee):
         assignee.get('emailAddress', ''),
     ).strip()
 
+def transition_to(issue_name, to_id):
+    transition = {
+        "transition": {
+            "id": to_id,
+        }
+    }
+    r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
+                      json=transition,
+                      auth=settings.credentials())
+    if r.status_code == 404:
+        print("error: the issue does not exist or the user does not have permission to view it")
+        exit(1)
+    elif r.status_code == 400:
+        print("error: there is no transition specified")
+        exit(1)
+    elif r.status_code == 500:
+        print("error: 500 Internal server error")
+        exit(1)
+
 def commandIssue(ui):
     ui = ui.down()
     issue_name = ui.operands()[0]
     cached = Cache(issue_name)
     if str(ui) == 'transition':
         if '--to' in ui:
-            transition = {
-                "transition":{
-                    "id": ui.get("-t")
-                }
-            }
-            r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/transitions'.format(settings.get('domain'), issue_name),
-                              json=transition,
-                              auth=settings.credentials())
-            if r.status_code == 404:
-                print("error: the issue does not exist or the user does not have permission to view it")
-                exit(1)
-            elif r.status_code == 400:
-                print("error: there is no transition specified")
-                exit(1)
-            elif r.status_code == 500:
-                print("error: 500 Internal server error")
-                exit(1)
+            for to_id in ui.get('-t'):
+                transition_to(issue_name, *to_id)
         else:
             r = connection.get('/rest/api/2/issue/{}/transitions'.format(issue_name))
             if r.status_code == 200:
