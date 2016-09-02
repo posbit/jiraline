@@ -95,6 +95,9 @@ class Cache:
     def raw(self):
         return self._data.copy()
 
+    def is_cached(self):
+        return os.path.isfile(self.path())
+
     def load(self):
         cached_path = self.path()
         if not os.path.isfile(cached_path):
@@ -276,6 +279,7 @@ def stringifyAssignee(assignee):
 def commandIssue(ui):
     ui = ui.down()
     issue_name = ui.operands()[0]
+    cached = Cache(issue_name)
     if str(ui) == 'transition':
         if '--to' in ui:
             transition = {
@@ -315,8 +319,7 @@ def commandIssue(ui):
             else:
                 print('error: HTTP {}'.format(r.status_code))
                 exit(1)
-    elif str(ui) == 'issue':
-        cached = Cache(issue_name)
+    elif str(ui) == 'issue' and cached.is_cached():
         if '--field' not in ui:
             displayBasicInformation({
                 'key': issue_name,
