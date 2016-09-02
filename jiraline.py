@@ -79,6 +79,42 @@ def obtain(dictionary, *path, error=False, default=None):
             found = True
     return (value if found else default)
 
+class Cache:
+    def __init__(self, issue_key):
+        self._issue_key = issue_key
+        self._data = {}
+        self.load()
+
+    @staticmethod
+    def dir():
+        return os.path.join(os.path.expanduser('~'), '.cache', 'jiraline')
+
+    def path(self):
+        return os.path.join(os.path.expanduser('~'), '.cache', 'jiraline', '{}.json'.format(self._issue_key))
+
+    def load(self):
+        cached_path = self.path()
+        if not os.path.isfile(cached_path):
+            return self
+        with open(cached_path) as ifstream:
+            self._data = json.loads(ifstream.read())
+        return self
+
+    def store(self):
+        cached_path = self.path()
+        if not os.path.isdir(Cache.dir()):
+            os.makedirs(Cache.dir(), exist_ok=True)
+        with open(cached_path, 'w') as ofstream:
+            ofstream.write(json.dumps(self._data))
+        return self
+
+    def get(self, *path, default=None):
+        return self._data.get('.'.join(path), default)
+
+    def set(self, *path, value):
+        self._data['.'.join(path)] = value
+        return self
+
 class Settings:
     def __init__(self):
         self._settings = {}
