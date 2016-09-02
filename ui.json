@@ -179,6 +179,66 @@
             "operands":{
                 "no" : [1,1]
             }
+        },
+        "slug": {
+            "doc": {
+                "help": "Print sluggified issue titles.",
+                "usage": [
+                    "slug <issue-tag>"
+                ],
+                "examples": [
+                    {
+                        "line": "-gBC <issue-tag>",
+                        "desc": "sluggify <sha1> issue, and checkout to a newly created Git branch with the same name"
+                    }
+                ]
+            },
+            "options": {
+                "local": [
+                    {
+                        "short": "g",
+                        "long": "git",
+                        "conflicts": ["--format"],
+                        "help": "format slug in the Git-ready format"
+                    },
+                    {
+                        "short": "B",
+                        "long": "git-branch",
+                        "help": "create new Git branch using the slug as branch name"
+                    },
+                    {
+                        "short": "C",
+                        "long": "git-checkout",
+                        "help": "checkout Git branch with the same name as generated slug"
+                    },
+                    {
+                        "short": "f",
+                        "long": "format",
+                        "arguments": ["format:str"],
+                        "conflicts": ["--git"],
+                        "help": "use custom slug format"
+                    },
+                    {
+                        "short": "F",
+                        "long": "use-format",
+                        "arguments": ["str"],
+                        "conflicts": ["--git", "--format"],
+                        "help": "use preset slug format (set it with 'slug.format.<name>' config key)"
+                    },
+                    {
+                        "short": "p",
+                        "long": "param",
+                        "arguments": ["str", "str"],
+                        "conflicts": ["--git"],
+                        "wants": ["--format", "--use-format"],
+                        "plural": true,
+                        "help": "add parameter to use with format"
+                    }
+                ]
+            },
+            "operands": {
+                "no": [1, 1]
+            }
         }
     },
     "operands": {

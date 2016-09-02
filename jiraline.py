@@ -2,11 +2,13 @@
 
 import getpass
 import json
+import re
 import sys
 import os
 
-import requests
 import clap
+import requests
+import unidecode
 
 filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
 
@@ -364,6 +366,68 @@ def commandSearch(ui):
     else:
         print('error: HTTP {}'.format(r.status_code))
 
+def sluggify(issue_message):
+    return '-'.join(re.compile('[^ a-zA-Z0-9_]').sub(' ', unidecode.unidecode(issue_message).lower()).split())
+
+def commandSlug(ui):
+    ui = ui.down()
+    issue_name = ui.operands()[0]
+    #real_fields = ('summary', 'description', 'comment', 'created',)
+    request_content = {
+        'fields': 'summary',
+    }
+    r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
+    if r.status_code == 200:
+        response = json.loads(r.text)
+        issue_message = response.get('fields', {}).get('summary', None)
+        print(issue_message)
+        issue_slug = sluggify(issue_message)
+
+        slug_format = 'issue/{issue_key}/{slug}'
+        # if slug_format.startswith('@'):
+        #     slug_format = getConfig().get('slug.format.{0}'.format(slug_format[1:]), '')
+
+        if '--git' in ui:
+            slug_format = 'issue/{slug}'
+        if '--format' in ui:
+            slug_format = ui.get('--format')
+        if '--use-format' in ui:
+            print('warning: --use-format is not implemented')
+            #repo_config = getConfig()
+            # slug_format = repo_config.get('slug.format.{0}'.format(ui.get('--use-format')), '')
+            # if not slug_format:
+            #     print('fatal: undefined slug format: {0}'.format(ui.get('--use-format')))
+            #     exit(1)
+
+        if slug_format:
+            try:
+                issue_slug = slug_format.format(slug=issue_slug, issue_key=issue_name).lower()
+            except KeyError as e:
+                print('error: required parameter not found: {}'.format(str(e)))
+                exit(1)
+
+        if '--git-branch' in ui:
+            pass
+            # r = os.system('git branch {0}'.format(issue_slug))
+            # r = (r >> 8)
+            # if r != 0:
+            #     exit(r)
+        if '--git-checkout' in ui:
+            pass
+            # r = os.system('git checkout {0}'.format(issue_slug))
+            # r = (r >> 8)
+            # if r != 0:
+            #     exit(r)
+        if ('--git-branch' not in ui) and ('--git-checkout' not in ui):
+            print(issue_slug)
+
+    elif r.status_code == 404:
+        print("error: the requested issue is not found or the user does not have permission to view it.")
+        exit(1)
+    else:
+        print('error: HTTP {}'.format(r.status_code))
+        exit(1)
+
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
 
@@ -394,4 +458,5 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandAssign,
     commandIssue,
     commandSearch,
+    commandSlug,
 )
