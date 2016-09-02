@@ -326,7 +326,7 @@ def commandIssue(ui):
                     'description': cached.get('fields', 'description'),
                 }
             })
-            displayComments(cached.get('fields', 'comment', default=[]).get('comments', []))
+            displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
         else:
             fields = cached.raw()
             real_fields = ('summary', 'description', 'comment', 'created',)
@@ -343,9 +343,8 @@ def commandIssue(ui):
                     print('{} (undefined)'.format(key))
                 else:
                     print('{} = {}'.format(key, str(value).strip()))
-            displayComments(cached.get('fields', 'comment', default=[]).get('comments', []))
-    elif str(ui) == 'show':
-        cached = Cache(issue_name)
+            displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
+    elif str(ui) == 'show' or str(ui) == 'issue':
         real_fields = ('summary', 'description', 'comment', 'created',)
         selected_fields = []
         if '--field' in ui:
