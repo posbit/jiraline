@@ -217,6 +217,8 @@ class Connection:
 
     def put(self, url, **kwargs):
         return requests.put(self.url(url), auth=self._auth(), **kwargs)
+    def post(self, url, **kwargs):
+        return requests.post(self.url(url), auth=self._auth(), **kwargs)
 
 connection = Connection(settings)
 
@@ -443,6 +445,7 @@ def commandSearch(ui):
     else:
         print('error: HTTP {}'.format(r.status_code))
 
+
 def sluggify(issue_message):
     return '-'.join(re.compile('[^ a-zA-Z0-9_]').sub(' ', unidecode.unidecode(issue_message).lower()).split())
 
@@ -508,6 +511,25 @@ def commandSlug(ui):
     if ('--git-branch' not in ui) and ('--git-checkout' not in ui):
         print(issue_slug)
 
+
+def commandEstimate(ui):
+    ui = ui.down()
+    issue_name = ui.operands()[0]
+    estimation_time = ui.operands()[1]
+    request_content = {
+        "timeSpent":"1m"
+    }
+    request_params = {
+        "adjustEstimate":"new",
+        "newEstimate":estimation_time
+    }
+    r = connection.post('/rest/api/2/issue/{}/worklog'.format(issue_name),params=request_params,json=request_content)
+    if r.status_code == 400:
+        print('The input is invalid (e.g. missing required fields, invalid values, and so forth).')
+    elif r.status_code == 403:
+        print('Returned if the calling user does not have permission to add the worklog')
+
+
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
 
@@ -532,11 +554,11 @@ def dispatch(ui, *commands, overrides = {}, default_command=''):
                 cmd(ui)
                 break
 
-
 dispatch(ui,        # first: pass the UI object to dispatch
     commandComment,    # second: pass command handling functions
     commandAssign,
     commandIssue,
     commandSearch,
     commandSlug,
+    commandEstimate
 )
