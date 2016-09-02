@@ -405,17 +405,15 @@ def commandSlug(ui):
                 exit(1)
 
         if '--git-branch' in ui:
-            pass
-            # r = os.system('git branch {0}'.format(issue_slug))
-            # r = (r >> 8)
-            # if r != 0:
-            #     exit(r)
+            r = os.system('git branch {0}'.format(issue_slug))
+            r = (r >> 8)
+            if r != 0:
+                exit(r)
         if '--git-checkout' in ui:
-            pass
-            # r = os.system('git checkout {0}'.format(issue_slug))
-            # r = (r >> 8)
-            # if r != 0:
-            #     exit(r)
+            r = os.system('git checkout {0}'.format(issue_slug))
+            r = (r >> 8)
+            if r != 0:
+                exit(r)
         if ('--git-branch' not in ui) and ('--git-checkout' not in ui):
             print(issue_slug)
 
