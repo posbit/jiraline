@@ -92,6 +92,9 @@ class Cache:
     def path(self):
         return os.path.join(os.path.expanduser('~'), '.cache', 'jiraline', '{}.json'.format(self._issue_key))
 
+    def raw(self):
+        return self._data.copy()
+
     def load(self):
         cached_path = self.path()
         if not os.path.isfile(cached_path):
@@ -312,7 +315,37 @@ def commandIssue(ui):
             else:
                 print('error: HTTP {}'.format(r.status_code))
                 exit(1)
-    elif str(ui) in ('show', 'issue',):
+    elif str(ui) == 'issue':
+        cached = Cache(issue_name)
+        if '--field' not in ui:
+            displayBasicInformation({
+                'key': issue_name,
+                'fields': {
+                    'created': cached.get('fields', 'created'),
+                    'summary': cached.get('fields', 'summary'),
+                    'description': cached.get('fields', 'description'),
+                }
+            })
+            displayComments(cached.get('fields', 'comment', default=[]).get('comments', []))
+        else:
+            fields = cached.raw()
+            real_fields = ('summary', 'description', 'comment', 'created',)
+            selected_fields = []
+            if '--field' in ui:
+                real_fields = [_[0] for _ in ui.get('-f')]
+                selected_fields = [_.split('.')[0] for _ in real_fields]
+            for i, key in enumerate(real_fields):
+                if key == 'comment': continue
+                value = fields.get(key)
+                if key == 'assignee':
+                    value = stringifyAssignee(value)
+                if value is None:
+                    print('{} (undefined)'.format(key))
+                else:
+                    print('{} = {}'.format(key, str(value).strip()))
+            displayComments(cached.get('fields', 'comment', default=[]).get('comments', []))
+    elif str(ui) == 'show':
+        cached = Cache(issue_name)
         real_fields = ('summary', 'description', 'comment', 'created',)
         selected_fields = []
         if '--field' in ui:
@@ -324,6 +357,10 @@ def commandIssue(ui):
         r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
         if r.status_code == 200:
             response = json.loads(r.text)
+            for k, v in response.get('fields', {}).items():
+                cached.set('fields', k, value=v)
+            cached.store()
+
             if '--field' not in ui:
                 displayBasicInformation(response)
                 displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
