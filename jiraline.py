@@ -383,9 +383,10 @@ def commandSlug(ui):
         issue_message = response.get('fields', {}).get('summary', None)
         issue_slug = sluggify(issue_message)
 
-        slug_format = 'issue/{issue_key}/{slug}'
-        # if slug_format.startswith('@'):
-        #     slug_format = getConfig().get('slug.format.{0}'.format(slug_format[1:]), '')
+        default_slug_format = 'issue/{issue_key}/{slug}'
+        slug_format = settings.get('slug', 'format', 'default', default=default_slug_format)
+        if slug_format.startswith('@'):
+            slug_format = settings.get('slug', 'format', slug_format[1:], default=default_slug_format)
 
         if '--git' in ui:
             slug_format = 'issue/{slug}'
