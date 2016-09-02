@@ -84,6 +84,41 @@ assignee = John Doe <email@example.com>
 assignee.emailAddress = email@example.com
 ```
 
+### Sluggification and branching
+
+Jiraline provides `slug` command which can be used to generate branch names from issue titles.
+It can also create and checkout Git branches based on issue titles.
+
+#### Sluggification
+
+```
+jiraline slug [-F/--use-format <format_name>] [-f/--format <format_string>] [--git] <issue_name>
+```
+
+The simplest form of this command is just `jiraline slug JL-42`, which will print a branch name to standard output.
+It provides options for adjusting slug formats:
+
+- `--use-format` will load a format from settings
+- `--format` will use supplied parameter as format
+- `--git` will use simple Git-ready format
+
+#### Branching
+
+```
+jiraline slug [-B/--git-branch] [-C/--git-checkout] <issue_name>
+```
+
+To create a Git branch from slug use `-B/--git-branch` option.
+To checkout a Git branch use `-C/--git-checkout` option (*note*: `-C` does not automatically create branches).
+To create and checkout a branch use `-BC` combo.
+
+Example:
+
+```
+jiraline ba0bab4 (devel) ]$ jiraline slug -BCg JL-42
+jiraline ba0bab4 (issue/jl-42/example) ]$
+```
+
 
 ### Built-in help screens
 
