@@ -372,7 +372,6 @@ def sluggify(issue_message):
 def commandSlug(ui):
     ui = ui.down()
     issue_name = ui.operands()[0]
-    #real_fields = ('summary', 'description', 'comment', 'created',)
     request_content = {
         'fields': 'summary',
     }
