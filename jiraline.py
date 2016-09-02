@@ -471,7 +471,7 @@ def commandSlug(ui):
     issue_message = cached.get('fields', 'summary')
     if not issue_message:
         issue_message = fetch_summary(issue_name)
-        cached.set('fields', 'summary', value='test summary')
+        cached.set('fields', 'summary', value=issue_message)
         cached.store()
 
     issue_slug = sluggify(issue_message)
