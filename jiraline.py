@@ -379,7 +379,6 @@ def commandSlug(ui):
     if r.status_code == 200:
         response = json.loads(r.text)
         issue_message = response.get('fields', {}).get('summary', None)
-        print(issue_message)
         issue_slug = sluggify(issue_message)
 
         slug_format = 'issue/{issue_key}/{slug}'
