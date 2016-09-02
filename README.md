@@ -120,6 +120,23 @@ jiraline ba0bab4 (issue/jl-42/example) ]$
 ```
 
 
+### Time estimating
+
+To estimate work time for issue use `estimate` command:
+
+```
+jiraline estimate <issue_name> <time> 
+```
+
+Time is in JIRA format.
+
+Example:
+```
+jiraline estimate IP-1345 3h
+jiraline estimate IP-1345 "3h 15m"
+```
+
+
 ### Built-in help screens
 
 To display built-in help screens use `help` command (help screens are automatically
