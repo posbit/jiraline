@@ -28,6 +28,12 @@
                 "short": "v",
                 "help": "display verbose output"
             }
+        ],
+        "local": [
+            {
+                "long": "version",
+                "help": "display version"
+            }
         ]
     },
     "commands":{

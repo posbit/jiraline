@@ -10,6 +10,11 @@ import clap
 import requests
 import unidecode
 
+
+# Jiraline version
+__version__ = '0.1.0'
+
+
 filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
 
 model = {}
@@ -55,6 +60,9 @@ finally:
     ui = parser.parse().ui().finalise()
 
 if clap.helper.HelpRunner(ui=ui, program=sys.argv[0]).adjust(options=['-h', '--help']).run().displayed(): exit(0)
+if '--version' in ui:
+    print(('jiraline version {}' if '--verbose' in ui else '{}').format(__version__))
+    exit(0)
 
 
 ui = ui.down()
