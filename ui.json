@@ -108,6 +108,18 @@
                 "no" : [1,1]
             }
         },
+        "estimate":{
+            "doc":{
+                "help":"Estimate time of issue"
+            },
+            "options":{
+                "local": [
+                ]
+            },
+            "operands":{
+                "no" : [2,2]
+            }
+        },
         "issue" : {
             "doc": {
                 "help": "Basic issue management and information retrieval"
