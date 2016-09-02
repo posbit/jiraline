@@ -4,10 +4,11 @@
         "usage": [
             "--help",
             "--version",
-            "jiraline <issue-name>",
-            "jiraline show <issue-name>",
+            "jiraline issue <issue-name>",
+            "jiraline issue show <issue-name>",
             "jiraline comment -m <message> <issue-name>",
-            "jiraline assign -u <username> <issue-name>"
+            "jiraline assign -u <username> <issue-name>",
+            "jiraline slug -BC <issue-name>"
         ],
         "examples": [
             {
