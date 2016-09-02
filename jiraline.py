@@ -493,7 +493,7 @@ def commandSlug(ui):
 
     if slug_format:
         try:
-            issue_slug = slug_format.format(slug=issue_slug, issue_key=issue_name).lower()
+            issue_slug = slug_format.format(slug=issue_slug, issue_key=issue_name)
         except KeyError as e:
             print('error: required parameter not found: {}'.format(str(e)))
             exit(1)
