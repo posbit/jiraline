@@ -106,12 +106,14 @@ class Settings:
         return self
 
     # Low-level access API.
-    def get(self, *path):
+    def get(self, *path, default=None):
         value = self._settings
         for key in path:
-            if key not in value:
+            if key not in value and default is None:
                 print('error: key missing from configuration: {}'.format('.'.join(path)))
                 exit(1)
+            if key not in value and default is not None:
+                return default
             value = value[key]
             if type(value) is not dict:
                 break
