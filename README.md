@@ -188,3 +188,73 @@ Sample valid config that will let you connect to `example.atlassian.net`:
      }
 }
 ```
+
+### Slug formats
+
+Put slug formats in `slug.format` dictionary:
+
+```
+{
+    "slug": {
+        "format": {
+            "<format name>": "<your example format>"
+        }
+    }
+}
+```
+
+By default Jiraline uses `default` format.
+You can either put default format in `slug.format.default` key, or
+use indirection, i.e. set `slug.format.default` key to `@example` and
+Jiraline will use the format named `example`.
+
+Example with direct format:
+
+```
+{
+    "slug": {
+        "format": {
+            "default": "issue/{issue_key}/{slug}"
+        }
+    }
+}
+```
+
+Example with indirection:
+
+```
+{
+    "slug": {
+        "format": {
+            "default": "@non-default"
+            "non-default": "non-default-format/{issue_key}/{slug}"
+        }
+    }
+}
+```
+
+You can switch formats on-fly using `-F` option.
+For example, using the following config:
+
+```
+{
+    "slug": {
+        "format": {
+            "default": "@foo"
+            "foo": "foo/{issue_key}/{slug}",
+            "bat": "bar/{issue_key}/{slug}"
+        }
+    }
+}
+```
+
+You can achieve following results:
+
+````
+jiraline ba0bab4 (devel) ]$ jiraline slug JL-42
+foo/jl-42/example
+jiraline ba0bab4 (devel) ]$ jiraline slug -F foo JL-42
+foo/jl-42/example
+jiraline ba0bab4 (devel) ]$ jiraline slug -F bar JL-42
+bar/jl-42/example
+```
