@@ -194,6 +194,17 @@
                     "operands": {
                         "no": [1, 1]
                     }
+                },
+                "label" : {
+                    "doc": {
+                        "help": "Set, add or remove label from issue",
+                        "usage": [
+                            "issue label <issue-name> \"<label>\""
+                        ]
+                    },
+                    "operands": {
+                        "no": [2, 2]
+                    }
                 }
             },
             "operands":{
