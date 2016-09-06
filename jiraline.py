@@ -305,6 +305,31 @@ def transition_to(issue_name, to_id):
         print("error: 500 Internal server error")
         exit(1)
 
+def add_label(issue_name, label):
+    payload = {
+        "update": {
+            "labels":[
+                {
+                    "add": label
+                }
+            ]
+        }
+    }
+
+    r = connection.put('/rest/api/2/issue/{}'.format(issue_name), json=payload)
+    if r.status_code == 404:
+        print("error: the issue does not exist or the user does not have permission to view it")
+        exit(1)
+    elif r.status_code == 400:
+        print("error: the requested issue update failed")
+        exit(1)
+    elif r.status_code == 403:
+        print("error: the user tries to disable users notification or override screen security but doesn't have permission to do that")
+        exit(1)
+    elif r.status_code == 500:
+        print("error: 500 Internal server error")
+        exit(1)
+
 def commandIssue(ui):
     ui = ui.down()
     issue_name = ui.operands()[0]
@@ -402,6 +427,10 @@ def commandIssue(ui):
         else:
             print('error: HTTP {}'.format(r.status_code))
             exit(1)
+    elif str(ui) == 'label':
+        issue_name, label = ui.operands()
+        add_label(issue_name, label)
+
 
 def commandSearch(ui):
     request_content = {
