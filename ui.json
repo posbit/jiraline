@@ -216,6 +216,17 @@
                     "operands": {
                         "no": [2, 2]
                     }
+                },
+                "type" : {
+                    "doc": {
+                        "help": "Set type of issue",
+                        "usage": [
+                            "issue type <issue-name> \"<type id>\""
+                        ]
+                    },
+                    "operands": {
+                        "no": [2, 2]
+                    }
                 }
             },
             "operands":{
