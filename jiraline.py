@@ -364,6 +364,11 @@ def fetch_summary(issue_name):
         print('error: HTTP {}'.format(r.status_code))
         exit(1)
 
+def expand_issue_name(issue_name):
+    if issue_name.isdigit():
+        issue_name = '{}-{}'.format(settings.get('default_project'), issue_name)
+    return issue_name
+
 
 ################################################################################
 # Commands.
@@ -398,7 +403,7 @@ def commandAssign(ui):
 
 def commandIssue(ui):
     ui = ui.down()
-    issue_name = ui.operands()[0]
+    issue_name = expand_issue_name(ui.operands()[0])
     cached = Cache(issue_name)
     if str(ui) == 'transition':
         if '--to' in ui:
