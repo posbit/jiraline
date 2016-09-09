@@ -205,6 +205,17 @@
                     "operands": {
                         "no": [2, 2]
                     }
+                },
+                "priority" : {
+                    "doc": {
+                        "help": "Set priority of issue",
+                        "usage": [
+                            "issue priority <issue-name> \"<id of priority>\""
+                        ]
+                    },
+                    "operands": {
+                        "no": [2, 2]
+                    }
                 }
             },
             "operands":{
