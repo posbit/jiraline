@@ -500,6 +500,7 @@ def commandIssue(ui):
             exit(1)
     elif str(ui) == 'label':
         issue_name, label = ui.operands()
+        issue_name = expand_issue_name(issue_name)
         add_label(issue_name, label)
 
 
