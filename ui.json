@@ -72,6 +72,10 @@
                         "short": "n",
                         "help": "number of results to be shown",
                         "arguments" : ["number:int"]
+                    },
+                    {
+                        "long": "table",
+                        "help": "display issues in a table, instead of the default Git-style list"
                     }
                 ]
             },

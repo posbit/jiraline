@@ -10,6 +10,11 @@ import clap
 import requests
 import unidecode
 
+try:
+    import colored
+except ImportError:
+    colored = None
+
 
 # Jiraline version
 __version__ = '0.1.0'
@@ -431,21 +436,53 @@ def commandIssue(ui):
         issue_name, label = ui.operands()
         add_label(issue_name, label)
 
+def colorise(color, string):
+    if colored:
+        string = (colored.fg(color) + str(string) + colored.attr('reset'))
+    return string
+
+def print_abbrev_issue_summary(issue, ui):
+    key = issue.get('key', '<undefined>')
+    fields = issue.get('fields', {})
+    summary = fields.get('summary', '')
+    if colored:
+        key = colorise('yellow', key)
+
+    formatted_line = '{} {}'.format(key, summary)
+    if '--verbose' in ui:
+        assignee_string = 'unassigned'
+        assignee = fields.get('assignee', {})
+        if assignee:
+            assignee = colorise('light_blue', '{}'.format(stringifyAssignee(assignee)))
+        assignee_string = colorise('light_blue', 'assignee: {}'.format(assignee))
+        priority = fields.get('priority', {}).get('name')
+        priority_string = colorise('green', priority)
+        formatted_line = '{}'
+        formats = [key]
+        if '--status' not in ui:
+            formatted_line +=  ' [{}/{}]'
+            formats.append(colorise('cyan', '{}:{}'.format(fields.get('status', {}).get('id', 0), fields.get('status', {}).get('name', ''))))
+            formats.append(priority_string)
+        formatted_line += ' {}'
+        formats.append(summary)
+        formatted_line += ' ({})'
+        formats.append(assignee_string)
+        formatted_line = formatted_line.format(*formats)
+    print(formatted_line)
 
 def commandSearch(ui):
     request_content = {
-        "jql": "",
-        "startAt": 0,
-        "maxResults": 15,
-        "fields": [
-            "summary",
-            "status",
-            "assignee",
-            "status",
-            "created",
-            "status"
+        'jql': '',
+        'startAt': 0,
+        'maxResults': 15,
+        'fields': [
+            'summary',
+            'status',
+            'assignee',
+            'priority',
+            'created',
         ],
-        "fieldsByKeys": False
+        'fieldsByKeys': False,
     }
     conditions = []
     if "-p" in ui:
@@ -463,26 +500,30 @@ def commandSearch(ui):
     r = connection.get('/rest/api/2/search', params=request_content)
     if r.status_code == 200:
         response = json.loads(r.text)
-        print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
-        print('-' * 130)
-        for i in response['issues']:
-            key = i['key']
-            fields = i.get('fields', {})
-            summary = fields.get('summary', '')
-            assignee = fields.get('assignee', {})
-            if assignee is None:
-                assignee = {}
-            assignee_display_name = assignee.get('displayName', '')
-            created = fields.get('created', '')
-            status_name = fields.get('status', {}).get('name', '')
-            message_line = '{:<.7} | {:<50.50} | {:<20.20} | {:<19.19} | {:<20.20}'.format(
-                key,
-                summary,
-                assignee_display_name,
-                created,
-                status_name,
-            )
-            print(message_line)
+        if '--table' not in ui:
+            for i in response.get('issues', []):
+                print_abbrev_issue_summary(i, ui)
+        else:
+            print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
+            print('-' * 130)
+            for i in response['issues']:
+                key = i['key']
+                fields = i.get('fields', {})
+                summary = fields.get('summary', '')
+                assignee = fields.get('assignee', {})
+                if assignee is None:
+                    assignee = {}
+                assignee_display_name = assignee.get('displayName', '')
+                created = fields.get('created', '')
+                status_name = fields.get('status', {}).get('name', '')
+                message_line = '{:<.7} | {:<50.50} | {:<20.20} | {:<19.19} | {:<20.20}'.format(
+                    key,
+                    summary,
+                    assignee_display_name,
+                    created,
+                    status_name,
+                )
+                print(message_line)
     else:
         print('error: HTTP {}'.format(r.status_code))
 
