@@ -210,7 +210,7 @@
                     "doc": {
                         "help": "Set priority of issue",
                         "usage": [
-                            "issue priority <issue-name> \"<id of priority>\""
+                            "issue priority <issue-name> \"<priority id>\""
                         ]
                     },
                     "operands": {
