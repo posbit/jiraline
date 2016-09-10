@@ -227,6 +227,17 @@
                     "operands": {
                         "no": [2, 2]
                     }
+                },
+                "customfield-executor" : {
+                    "doc": {
+                        "help": "Add executor customfield to issue",
+                        "usage": [
+                            "issue customfield-executor <issue-name> \"<text message>\""
+                        ]
+                    },
+                    "operands": {
+                        "no": [2, 2]
+                    }
                 }
             },
             "operands":{
