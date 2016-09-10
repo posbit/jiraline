@@ -357,6 +357,29 @@ def set_priority(issue_name, id):
         print("error: 500 Internal server error")
         exit(1)
 
+def set_type(issue_name, type_name):
+    payload = {
+        "fields": {
+            "issuetype": {
+                "name": type_name
+            }
+        }
+    }
+
+    r = connection.put('/rest/api/2/issue/{}'.format(issue_name), json=payload)
+    if r.status_code == 404:
+        print("error: the issue does not exist or the user does not have permission to view it")
+        exit(1)
+    elif r.status_code == 400:
+        print("error: the requested issue update failed")
+        exit(1)
+    elif r.status_code == 403:
+        print("error: the user tries to disable users notification or override screen security but doesn't have permission to do that")
+        exit(1)
+    elif r.status_code == 500:
+        print("error: 500 Internal server error")
+        exit(1)
+
 def commandIssue(ui):
     ui = ui.down()
     issue_name = ui.operands()[0]
@@ -460,6 +483,9 @@ def commandIssue(ui):
     elif str(ui) == 'priority':
         issue_name, id = ui.operands()
         set_priority(issue_name, id)
+    elif str(ui) == 'type':
+        issue_name, type_name = ui.operands()
+        set_type(issue_name, type_name)
 
 
 def commandSearch(ui):
