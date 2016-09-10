@@ -376,6 +376,28 @@ def set_type(issue_name, type_name):
         print("error: 500 Internal server error")
         exit(1)
 
+def set_customfield_executor(issue_name, message):
+    payload = {
+        "fields": {
+            "customfield_10101": message
+        }
+    }
+
+    r = connection.put('/rest/api/2/issue/{}'.format(issue_name), json=payload)
+    print(r.status_code)
+    if r.status_code == 404:
+        print("error: the issue does not exist or the user does not have permission to view it")
+        exit(1)
+    elif r.status_code == 400:
+        print("error: the requested issue update failed")
+        exit(1)
+    elif r.status_code == 403:
+        print("error: the user tries to disable users notification or override screen security but doesn't have permission to do that")
+        exit(1)
+    elif r.status_code == 500:
+        print("error: 500 Internal server error")
+        exit(1)
+
 def commandIssue(ui):
     ui = ui.down()
     issue_name = ui.operands()[0]
@@ -482,7 +504,9 @@ def commandIssue(ui):
     elif str(ui) == 'type':
         issue_name, type_name = ui.operands()
         set_type(issue_name, type_name)
-
+    elif str(ui) == 'customfield-executor':
+        issue_name, message = ui.operands()
+        set_customfield_executor(issue_name, message)
 
 def commandSearch(ui):
     request_content = {
