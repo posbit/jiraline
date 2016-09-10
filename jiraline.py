@@ -332,14 +332,10 @@ def add_label(issue_name, label):
 
 def set_priority(issue_name, id):
     payload = {
-        "update": {
-            "priority":[
-                {
-                    "set": {
-                        "id": id
-                    }
-                }
-            ]
+        "fields": {
+            "priority": {
+                "id": id
+            }
         }
     }
 
