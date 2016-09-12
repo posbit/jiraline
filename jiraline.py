@@ -702,9 +702,14 @@ def commandEstimate(ui):
     }
     r = connection.post('/rest/api/2/issue/{}/worklog'.format(issue_name),params=request_params,json=request_content)
     if r.status_code == 400:
-        print('The input is invalid (e.g. missing required fields, invalid values, and so forth).')
+        print('error: the input is invalid (e.g. missing required fields, invalid values, and so forth).')
+        exit(1)
     elif r.status_code == 403:
-        print('Returned if the calling user does not have permission to add the worklog')
+        print('error: returned if the calling user does not have permission to add the worklog')
+        exit(1)
+    elif r.status_code != 200:
+        print('error: other error')
+        exit(1)
 
 
 ################################################################################
