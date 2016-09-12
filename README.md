@@ -73,6 +73,19 @@ If only basic information is needed, a shortcut may be used:
 jiraline issue <issue_name>
 ```
 
+#### Note about caching
+
+Jira is slow.
+Network is also slow.
+Disk reads are (relatively) fast.
+
+This is why Jiraline tries to cache issue details whenever it can.
+Running `jiraline issue <issue-name>` command will display cached data if
+available.
+Running `jiraline issue show <issue-name>` command will always fetch fresh
+data from network disregarding cache.
+
+
 #### Displaying detailed fields
 
 To access nested fields in Jira responses use dot-separated keys parts:
