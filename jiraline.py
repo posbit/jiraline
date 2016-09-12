@@ -707,7 +707,7 @@ def commandEstimate(ui):
     elif r.status_code == 403:
         print('error: returned if the calling user does not have permission to add the worklog')
         exit(1)
-    elif r.status_code != 200:
+    elif not (r.status_code >= 200 and r.status_code < 300):
         print('error: other error')
         exit(1)
 
