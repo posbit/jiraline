@@ -641,7 +641,7 @@ def commandSearch(ui):
 
 def commandSlug(ui):
     ui = ui.down()
-    issue_name = ui.operands()[0]
+    issue_name = expand_issue_name(ui.operands()[0])
 
     cached = Cache(issue_name)
     issue_message = cached.get('fields', 'summary')
