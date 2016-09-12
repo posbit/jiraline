@@ -442,7 +442,7 @@ def expand_issue_name(issue_name):
 # Commands.
 #
 def commandComment(ui):
-    issue_name = ui.operands()[0]
+    issue_name = expand_issue_name(ui.operands()[0])
     message = ""
     if "-m" in ui:
         message = ui.get("-m")
