@@ -10,6 +10,11 @@ import clap
 import requests
 import unidecode
 
+try:
+    import colored
+except ImportError:
+    colored = None
+
 
 # Jiraline version
 __version__ = '0.1.0'
@@ -230,56 +235,10 @@ class Connection:
 
 connection = Connection(settings)
 
-def commandComment(ui):
-    issue_name = ui.operands()[0]
-    message = ""
-    if "-m" in ui:
-        message = ui.get("-m")
-    else:
-        message = input("Please type comment message: ")
-    comment={"body":message}
-    r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/comment'.format(settings.get('domain'), issue_name),
-                      json=comment,
-                      auth=settings.credentials())
-    if r.status_code == 400:
-        print('The input is invalid (e.g. missing required fields, invalid values, and so forth).')
 
-def commandAssign(ui):
-    issue_name = ui.operands()[0]
-    user_name = ui.get('-u')
-    assign = {'name': user_name}
-    r = connection.put('/rest/api/2/issue/{}/assignee'.format(issue_name), json=assign)
-    if r.status_code == 400:
-        print('There is a problem with the received user representation.')
-    elif r.status_code == 401:
-        print("Calling user does not have permission to assign the issue.")
-    elif r.status_code == 404:
-        print("Either the issue or the user does not exist.")
-
-def displayBasicInformation(data):
-    fields = data.get('fields', {})
-    print('issue {}'.format(data['key']))
-
-    created = fields.get('created', '')
-    if created:
-        print('Created {}'.format(created))
-
-    summary = fields.get('summary', '')
-    if summary:
-        print('\n    {}'.format(summary))
-
-    description = fields.get('description', '')
-    if description:
-        print('\nDescription:\n{}'.format(description))
-
-def displayComments(comments):
-    if comments:
-        print("\nComments:")
-        for c in comments:
-            print('----------------------------------')
-            print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
-            print('{}'.format(c["body"]))
-
+################################################################################
+# Helper functions.
+#
 def stringifyAssignee(assignee):
     return '{} <{}>'.format(
         assignee.get('displayName', ''),
@@ -398,9 +357,121 @@ def set_customfield_executor(issue_name, message):
         print("error: 500 Internal server error")
         exit(1)
 
+def colorise(color, string):
+    if colored:
+        string = (colored.fg(color) + str(string) + colored.attr('reset'))
+    return string
+
+def sluggify(issue_message):
+    return '-'.join(re.compile('[^ a-zA-Z0-9_]').sub(' ', unidecode.unidecode(issue_message).lower()).split())
+
+def displayBasicInformation(data):
+    fields = data.get('fields', {})
+    print('issue {}'.format(data['key']))
+
+    created = fields.get('created', '')
+    if created:
+        print('Created {}'.format(created))
+
+    summary = fields.get('summary', '')
+    if summary:
+        print('\n    {}'.format(summary))
+
+    description = fields.get('description', '')
+    if description:
+        print('\nDescription:\n{}'.format(description))
+
+def displayComments(comments):
+    if comments:
+        print("\nComments:")
+        for c in comments:
+            print('----------------------------------')
+            print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
+            print('{}'.format(c["body"]))
+
+def print_abbrev_issue_summary(issue, ui):
+    key = issue.get('key', '<undefined>')
+    fields = issue.get('fields', {})
+    summary = fields.get('summary', '')
+    if colored:
+        key = colorise('yellow', key)
+
+    formatted_line = '{} {}'.format(key, summary)
+    if '--verbose' in ui:
+        assignee_string = 'unassigned'
+        assignee = fields.get('assignee', {})
+        if assignee:
+            assignee = colorise('light_blue', '{}'.format(stringifyAssignee(assignee)))
+        assignee_string = colorise('light_blue', 'assignee: {}'.format(assignee))
+        priority = fields.get('priority', {}).get('name')
+        priority_string = colorise('green', priority)
+        formatted_line = '{}'
+        formats = [key]
+        if '--status' not in ui:
+            formatted_line +=  ' [{}/{}]'
+            formats.append(colorise('cyan', '{}:{}'.format(fields.get('status', {}).get('id', 0), fields.get('status', {}).get('name', ''))))
+            formats.append(priority_string)
+        formatted_line += ' {}'
+        formats.append(summary)
+        formatted_line += ' ({})'
+        formats.append(assignee_string)
+        formatted_line = formatted_line.format(*formats)
+    print(formatted_line)
+
+def fetch_summary(issue_name):
+    r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params={
+        'fields': 'summary',
+    })
+    if r.status_code == 200:
+        response = json.loads(r.text)
+        return response.get('fields', {}).get('summary', None)
+    elif r.status_code == 404:
+        print("error: the requested issue is not found or the user does not have permission to view it.")
+        exit(1)
+    else:
+        print('error: HTTP {}'.format(r.status_code))
+        exit(1)
+
+def expand_issue_name(issue_name):
+    if issue_name.isdigit():
+        issue_name = '{}-{}'.format(settings.get('default_project'), issue_name)
+    return issue_name
+
+
+################################################################################
+# Commands.
+#
+def commandComment(ui):
+    issue_name = ui.operands()[0]
+    message = ""
+    if "-m" in ui:
+        message = ui.get("-m")
+    else:
+        message = input("Please type comment message: ")
+    comment={"body":message}
+    r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/comment'.format(settings.get('domain'), issue_name),
+                      json=comment,
+                      auth=settings.credentials())
+    if r.status_code == 400:
+        print('The input is invalid (e.g. missing required fields, invalid values, and so forth).')
+
+
+def commandAssign(ui):
+    issue_name = ui.operands()[0]
+    user_name = ui.get('-u')
+    assign = {'name': user_name}
+    r = connection.put('/rest/api/2/issue/{}/assignee'.format(issue_name), json=assign)
+    if r.status_code == 400:
+        print('There is a problem with the received user representation.')
+    elif r.status_code == 401:
+        print("Calling user does not have permission to assign the issue.")
+    elif r.status_code == 404:
+        print("Either the issue or the user does not exist.")
+
+
 def commandIssue(ui):
     ui = ui.down()
-    issue_name = ui.operands()[0]
+    issue_name = expand_issue_name(ui.operands()[0])
     cached = Cache(issue_name)
     if str(ui) == 'transition':
         if '--to' in ui:
@@ -496,8 +567,10 @@ def commandIssue(ui):
             print('error: HTTP {}'.format(r.status_code))
             exit(1)
     elif str(ui) == 'label':
-        issue_name, label = ui.operands()
-        add_label(issue_name, label)
+        issue_name, *labels = ui.operands()
+        issue_name = expand_issue_name(issue_name)
+        for label in labels:
+            add_label(issue_name, label)
     elif str(ui) == 'priority':
         issue_name, id = ui.operands()
         set_priority(issue_name, id)
@@ -510,18 +583,17 @@ def commandIssue(ui):
 
 def commandSearch(ui):
     request_content = {
-        "jql": "",
-        "startAt": 0,
-        "maxResults": 15,
-        "fields": [
-            "summary",
-            "status",
-            "assignee",
-            "status",
-            "created",
-            "status"
+        'jql': '',
+        'startAt': 0,
+        'maxResults': 15,
+        'fields': [
+            'summary',
+            'status',
+            'assignee',
+            'priority',
+            'created',
         ],
-        "fieldsByKeys": False
+        'fieldsByKeys': False,
     }
     conditions = []
     if "-p" in ui:
@@ -539,46 +611,33 @@ def commandSearch(ui):
     r = connection.get('/rest/api/2/search', params=request_content)
     if r.status_code == 200:
         response = json.loads(r.text)
-        print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
-        print('-' * 130)
-        for i in response['issues']:
-            key = i['key']
-            fields = i.get('fields', {})
-            summary = fields.get('summary', '')
-            assignee = fields.get('assignee', {})
-            if assignee is None:
-                assignee = {}
-            assignee_display_name = assignee.get('displayName', '')
-            created = fields.get('created', '')
-            status_name = fields.get('status', {}).get('name', '')
-            message_line = '{:<.7} | {:<50.50} | {:<20.20} | {:<19.19} | {:<20.20}'.format(
-                key,
-                summary,
-                assignee_display_name,
-                created,
-                status_name,
-            )
-            print(message_line)
+        if '--table' not in ui:
+            for i in response.get('issues', []):
+                print_abbrev_issue_summary(i, ui)
+        else:
+            print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
+            print('-' * 130)
+            for i in response['issues']:
+                key = i['key']
+                fields = i.get('fields', {})
+                summary = fields.get('summary', '')
+                assignee = fields.get('assignee', {})
+                if assignee is None:
+                    assignee = {}
+                assignee_display_name = assignee.get('displayName', '')
+                created = fields.get('created', '')
+                status_name = fields.get('status', {}).get('name', '')
+                message_line = '{:<.7} | {:<50.50} | {:<20.20} | {:<19.19} | {:<20.20}'.format(
+                    key,
+                    summary,
+                    assignee_display_name,
+                    created,
+                    status_name,
+                )
+                print(message_line)
     else:
         print('error: HTTP {}'.format(r.status_code))
 
-
-def sluggify(issue_message):
-    return '-'.join(re.compile('[^ a-zA-Z0-9_]').sub(' ', unidecode.unidecode(issue_message).lower()).split())
-
-def fetch_summary(issue_name):
-    r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params={
-        'fields': 'summary',
-    })
-    if r.status_code == 200:
-        response = json.loads(r.text)
-        return response.get('fields', {}).get('summary', None)
-    elif r.status_code == 404:
-        print("error: the requested issue is not found or the user does not have permission to view it.")
-        exit(1)
-    else:
-        print('error: HTTP {}'.format(r.status_code))
-        exit(1)
 
 def commandSlug(ui):
     ui = ui.down()
@@ -647,6 +706,9 @@ def commandEstimate(ui):
         print('Returned if the calling user does not have permission to add the worklog')
 
 
+################################################################################
+# Program's entry point.
+#
 def dispatch(ui, *commands, overrides = {}, default_command=''):
     """Semi-automatic command dispatcher.
 
