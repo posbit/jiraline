@@ -499,9 +499,10 @@ def commandIssue(ui):
             print('error: HTTP {}'.format(r.status_code))
             exit(1)
     elif str(ui) == 'label':
-        issue_name, label = ui.operands()
+        issue_name, *labels = ui.operands()
         issue_name = expand_issue_name(issue_name)
-        add_label(issue_name, label)
+        for label in labels:
+            add_label(issue_name, label)
 
 
 def commandSearch(ui):
