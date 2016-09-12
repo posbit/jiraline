@@ -690,8 +690,9 @@ def commandSlug(ui):
 
 def commandEstimate(ui):
     ui = ui.down()
-    issue_name = ui.operands()[0]
+    issue_name = expand_issue_name(ui.operands()[0])
     estimation_time = ui.operands()[1]
+
     request_content = {
         "timeSpent":"1m"
     }
