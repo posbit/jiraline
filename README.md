@@ -275,3 +275,24 @@ foo/jl-42/example
 jiraline ba0bab4 (devel) ]$ jiraline slug -F bar JL-42
 bar/jl-42/example
 ```
+
+### Default project
+
+Setting default project allows writing just the numeric ID of an issue without prepending project prefix to it when
+specifying the issue for `jiraline` to work on.
+Example:
+
+```
+~]$ jiraline i sh JL-42
+~]$ jiraline i sh 42
+```
+
+If `default_project` key in `~/.jiraline` is set to `JL` the above lines are equivalent.
+Example configuration:
+
+```
+{
+    ...
+    "default_project": "JL"
+}
+```
