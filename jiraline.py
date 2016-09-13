@@ -437,6 +437,23 @@ def expand_issue_name(issue_name):
         issue_name = '{}-{}'.format(settings.get('default_project'), issue_name)
     return issue_name
 
+def get_message_from_editor(template='', fmt={}):
+    editor = os.getenv('EDITOR', 'vi')
+    message_path = os.path.expanduser(os.path.join('~', '.local', 'share', 'jiraline', 'tmp_message'))
+    if template and format:
+        with open(os.path.expanduser('~/.local/share/jiraline/messages/{0}'.format(template))) as ifstream:
+            default_message_text = ifstream.read()
+        with open(message_path, 'w') as ofstream:
+            ofstream.write(default_message_text.format(**fmt))
+    elif template and not format:
+        shutil.copy(os.path.expanduser('~/.local/share/jiraline/messages/{0}'.format(template)), message_path)
+    os.system('{0} {1}'.format(editor, message_path))
+    message = ''
+    with open(message_path) as ifstream:
+        message_lines = ifstream.readlines()
+        message = ''.join([l for l in message_lines if not l.lstrip().startswith('#')]).strip()
+    return message
+
 
 ################################################################################
 # Commands.
@@ -446,9 +463,14 @@ def commandComment(ui):
     message = ""
     if "-m" in ui:
         message = ui.get("-m")
-    else:
-        message = input("Please type comment message: ")
-    comment={"body":message}
+    if not message.strip():
+        message = get_message_from_editor('issue_comment_message')
+    if not message.strip():
+        print('error: aborting due to empty message')
+        exit(1)
+    comment = {
+        'body': message,
+    }
     r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/comment'.format(settings.get('domain'), issue_name),
                       json=comment,
                       auth=settings.credentials())
