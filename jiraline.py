@@ -432,9 +432,9 @@ def fetch_summary(issue_name):
         print('error: HTTP {}'.format(r.status_code))
         exit(1)
 
-def expand_issue_name(issue_name):
+def expand_issue_name(issue_name, project=None):
     if issue_name.isdigit():
-        issue_name = '{}-{}'.format(settings.get('default_project'), issue_name)
+        issue_name = '{}-{}'.format((project if project is not None else settings.get('default_project')), issue_name)
     return issue_name
 
 def get_message_from_editor(template='', fmt={}):
