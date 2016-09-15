@@ -625,6 +625,10 @@ def commandSearch(ui):
         conditions.append('assignee = {}'.format(ui.get("-a")))
     if '--reporter' in ui:
         conditions.append('reporter = {}'.format(ui.get('-r')))
+    if '--key-lower' in ui:
+        conditions.append('key >= {}'.format(expand_issue_name(ui.get('-L'), ui.get('-p'))))
+    if '--key-upper' in ui:
+        conditions.append('key <= {}'.format(expand_issue_name(ui.get('-U'), ui.get('-p'))))
     if "-s" in ui:
         conditions.append('status = {}'.format(ui.get("-s")))
     if "-j" in ui:

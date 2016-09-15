@@ -56,6 +56,18 @@
                         "help": "filter by reporter"
                     },
                     {
+                        "long": "key-upper",
+                        "short": "U",
+                        "arguments": ["str"],
+                        "help": "set upper bound for issue keys"
+                    },
+                    {
+                        "long": "key-lower",
+                        "short": "L",
+                        "arguments": ["str"],
+                        "help": "set lower bound for issue keys"
+                    },
+                    {
                         "long":"project",
                         "short": "p",
                         "help": "project identifier",
