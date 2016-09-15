@@ -108,6 +108,14 @@ class Cache:
     def raw(self):
         return self._data.copy()
 
+    def response(self):
+        raw_data = self.raw()
+        fields = dict([(key, value) for key, value in raw_data.items() if key.startswith('fields.')])
+        return {
+            'fields': fields,
+            'key': raw_data.get('key'),
+        }
+
     def is_cached(self):
         return os.path.isfile(self.path())
 
@@ -437,7 +445,6 @@ def fetch_summary(issue_name):
 def fetch_issue(issue_name):
     request_content = {}
     r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
-    response = None
     if r.status_code == 200:
         response = json.loads(r.text)
         cached = Cache(issue_name)
@@ -450,7 +457,7 @@ def fetch_issue(issue_name):
     else:
         print('error: HTTP {}'.format(r.status_code))
         exit(1)
-    return (cached, r)
+    return cached
 
 def expand_issue_name(issue_name, project=None):
     if issue_name.isdigit():
@@ -561,16 +568,16 @@ def commandIssue(ui):
                     print('{} = {}'.format(key, str(value).strip()))
             displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
     elif str(ui) == 'show' or str(ui) == 'issue':
-        cached, response = fetch_issue(issue_name)
+        cached = fetch_issue(issue_name)
         if '--field' not in ui:
             displayBasicInformation(cached)
             displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
         elif '--pretty' in ui:
-            print(json.dumps(response.get('fields', {}), indent=ui.get('--pretty')))
+            print(json.dumps(cached.response().get('fields', {}), indent=ui.get('--pretty')))
         elif '--raw' in ui:
-            print(json.dumps(response.get('fields', {})))
+            print(json.dumps(cached.response().get('fields', {})))
         else:
-            fields = response.get('fields', {})
+            fields = cached.response.get('fields', {})
             for i, key in enumerate(real_fields):
                 if key == 'comment': continue
                 value = obtain(fields, *key.split('.'))
@@ -580,7 +587,7 @@ def commandIssue(ui):
                     print('{} (undefined)'.format(key))
                 else:
                     print('{} = {}'.format(key, str(value).strip()))
-            displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
+            displayComments(cached.response().get('fields', {}).get('comment', {}).get('comments', []))
     elif str(ui) == 'label':
         issue_name, *labels = ui.operands()
         issue_name = expand_issue_name(issue_name)
