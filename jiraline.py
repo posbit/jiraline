@@ -110,7 +110,8 @@ class Cache:
 
     def response(self):
         raw_data = self.raw()
-        fields = dict([(key, value) for key, value in raw_data.items() if key.startswith('fields.')])
+        offset_start = len('fields.')
+        fields = dict([(key[offset_start:], value) for key, value in raw_data.items() if key.startswith('fields.')])
         return {
             'fields': fields,
             'key': raw_data.get('key'),
@@ -459,6 +460,16 @@ def fetch_issue(issue_name):
         exit(1)
     return cached
 
+def dump_issue(cached, ui):
+    data = cached.response().get('fields', {})
+    if '--field' in ui:
+        filtered_data = {}
+        for k in ui.get('-f'):
+            k = k[0]
+            filtered_data[k] = data.get(k)
+        data = filtered_data
+    return json.dumps(data, indent=ui.get('--pretty'))
+
 def show_issue(issue_name, ui, cached=None):
     if cached is None:
         cached = Cache(issue_name)
@@ -466,9 +477,9 @@ def show_issue(issue_name, ui, cached=None):
         displayBasicInformation(cached)
         displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
     elif '--pretty' in ui:
-        print(json.dumps(cached.response().get('fields', {}), indent=ui.get('--pretty')))
+        print(dump_issue(cached, ui))
     elif '--raw' in ui:
-        print(json.dumps(cached.response().get('fields', {})))
+        print(dump_issue(cached, ui))
     else:
         fields = cached.response.get('fields', {})
         for i, key in enumerate(real_fields):

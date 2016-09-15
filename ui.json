@@ -262,6 +262,29 @@
                     }
                 }
             },
+            "options": {
+                "local": [
+                    {
+                        "long": "field",
+                        "short": "f",
+                        "help": "select field to fetch and display",
+                        "arguments": ["field name:str"],
+                        "plural": true
+                    },
+                    {
+                        "long": "raw",
+                        "short": "r",
+                        "help": "display raw JSON output from Jira (does not support dot-access to nested fields)",
+                        "requires": ["--field"]
+                    },
+                    {
+                        "long": "pretty",
+                        "help": "pretty-print raw output (implies --raw)",
+                        "arguments": ["indent size:int"],
+                        "implies": ["--raw"]
+                    }
+                ]
+            },
             "operands":{
                 "no" : [1,1]
             }
