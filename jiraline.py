@@ -366,20 +366,22 @@ def sluggify(issue_message):
     return '-'.join(re.compile('[^ a-zA-Z0-9_]').sub(' ', unidecode.unidecode(issue_message).lower()).split())
 
 def displayBasicInformation(data):
-    fields = data.get('fields', {})
-    print('issue {}'.format(data['key']))
+    print('issue {}'.format(data.get('key')))
 
-    created = fields.get('created', '')
+    fields = lambda *path, default=None: data.get('fields', *path, default=default)
+
+    created = fields('created')
     if created:
-        print('Created {}'.format(created))
+        print('Created {}'.format(created.replace('T', ' ').replace('+', ' +')))
 
-    summary = fields.get('summary', '')
+    summary = fields('summary')
     if summary:
         print('\n    {}'.format(summary))
 
-    description = fields.get('description', '')
+    description = fields('description', default='').strip()
     if description:
-        print('\nDescription:\n{}'.format(description))
+        print('\nDescription\n')
+        print('\n'.join(['    {}'.format(_) for _ in description.splitlines()]))
 
 def displayComments(comments):
     if comments:
@@ -521,14 +523,7 @@ def commandIssue(ui):
                 exit(1)
     elif str(ui) == 'issue' and cached.is_cached():
         if '--field' not in ui:
-            displayBasicInformation({
-                'key': issue_name,
-                'fields': {
-                    'created': cached.get('fields', 'created'),
-                    'summary': cached.get('fields', 'summary'),
-                    'description': cached.get('fields', 'description'),
-                }
-            })
+            displayBasicInformation(cached)
             displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
         else:
             fields = cached.raw()
@@ -561,11 +556,12 @@ def commandIssue(ui):
             response = json.loads(r.text)
             for k, v in response.get('fields', {}).items():
                 cached.set('fields', k, value=v)
+            cached.set('key', value=issue_name)
             cached.store()
 
             if '--field' not in ui:
-                displayBasicInformation(response)
-                displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
+                displayBasicInformation(cached)
+                # displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
             elif '--pretty' in ui:
                 print(json.dumps(response.get('fields', {}), indent=ui.get('--pretty')))
             elif '--raw' in ui:
@@ -602,6 +598,7 @@ def commandIssue(ui):
     elif str(ui) == 'customfield-executor':
         issue_name, message = ui.operands()
         set_customfield_executor(issue_name, message)
+
 
 def commandSearch(ui):
     request_content = {
