@@ -612,6 +612,7 @@ def commandSearch(ui):
             'summary',
             'status',
             'assignee',
+            'reporter',
             'priority',
             'created',
         ],
@@ -622,6 +623,8 @@ def commandSearch(ui):
         conditions.append('project = {}'.format(ui.get("-p")))
     if "-a" in ui:
         conditions.append('assignee = {}'.format(ui.get("-a")))
+    if '--reporter' in ui:
+        conditions.append('reporter = {}'.format(ui.get('-r')))
     if "-s" in ui:
         conditions.append('status = {}'.format(ui.get("-s")))
     if "-j" in ui:

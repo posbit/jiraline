@@ -50,6 +50,12 @@
                         "arguments" : ["assignee:str"]
                     },
                     {
+                        "long": "reporter",
+                        "short": "r",
+                        "arguments": ["str"],
+                        "help": "filter by reporter"
+                    },
+                    {
                         "long":"project",
                         "short": "p",
                         "help": "project identifier",
