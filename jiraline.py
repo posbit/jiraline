@@ -561,7 +561,7 @@ def commandIssue(ui):
 
             if '--field' not in ui:
                 displayBasicInformation(cached)
-                # displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
+                displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
             elif '--pretty' in ui:
                 print(json.dumps(response.get('fields', {}), indent=ui.get('--pretty')))
             elif '--raw' in ui:
