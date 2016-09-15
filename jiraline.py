@@ -434,6 +434,24 @@ def fetch_summary(issue_name):
         print('error: HTTP {}'.format(r.status_code))
         exit(1)
 
+def fetch_issue(issue_name):
+    request_content = {}
+    r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
+    response = None
+    if r.status_code == 200:
+        response = json.loads(r.text)
+        cached = Cache(issue_name)
+        for k, v in response.get('fields', {}).items():
+            cached.set('fields', k, value=v)
+        cached.store()
+    elif r.status_code == 404:
+        print("error: the requested issue is not found or the user does not have permission to view it.")
+        exit(1)
+    else:
+        print('error: HTTP {}'.format(r.status_code))
+        exit(1)
+    return (cached, r)
+
 def expand_issue_name(issue_name, project=None):
     if issue_name.isdigit():
         issue_name = '{}-{}'.format((project if project is not None else settings.get('default_project')), issue_name)
@@ -543,47 +561,26 @@ def commandIssue(ui):
                     print('{} = {}'.format(key, str(value).strip()))
             displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
     elif str(ui) == 'show' or str(ui) == 'issue':
-        real_fields = ('summary', 'description', 'comment', 'created',)
-        selected_fields = []
-        if '--field' in ui:
-            real_fields = [_[0] for _ in ui.get('-f')]
-            selected_fields = [_.split('.')[0] for _ in real_fields]
-        request_content = {
-            'fields': ','.join(selected_fields),
-        }
-        r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
-        if r.status_code == 200:
-            response = json.loads(r.text)
-            for k, v in response.get('fields', {}).items():
-                cached.set('fields', k, value=v)
-            cached.set('key', value=issue_name)
-            cached.store()
-
-            if '--field' not in ui:
-                displayBasicInformation(cached)
-                displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
-            elif '--pretty' in ui:
-                print(json.dumps(response.get('fields', {}), indent=ui.get('--pretty')))
-            elif '--raw' in ui:
-                print(json.dumps(response.get('fields', {})))
-            else:
-                fields = response.get('fields', {})
-                for i, key in enumerate(real_fields):
-                    if key == 'comment': continue
-                    value = obtain(fields, *key.split('.'))
-                    if key == 'assignee':
-                        value = stringifyAssignee(value)
-                    if value is None:
-                        print('{} (undefined)'.format(key))
-                    else:
-                        print('{} = {}'.format(key, str(value).strip()))
-                displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
-        elif r.status_code == 404:
-            print("error: the requested issue is not found or the user does not have permission to view it.")
-            exit(1)
+        cached, response = fetch_issue(issue_name)
+        if '--field' not in ui:
+            displayBasicInformation(cached)
+            displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
+        elif '--pretty' in ui:
+            print(json.dumps(response.get('fields', {}), indent=ui.get('--pretty')))
+        elif '--raw' in ui:
+            print(json.dumps(response.get('fields', {})))
         else:
-            print('error: HTTP {}'.format(r.status_code))
-            exit(1)
+            fields = response.get('fields', {})
+            for i, key in enumerate(real_fields):
+                if key == 'comment': continue
+                value = obtain(fields, *key.split('.'))
+                if key == 'assignee':
+                    value = stringifyAssignee(value)
+                if value is None:
+                    print('{} (undefined)'.format(key))
+                else:
+                    print('{} = {}'.format(key, str(value).strip()))
+            displayComments(response.get('fields', {}).get('comment', {}).get('comments', []))
     elif str(ui) == 'label':
         issue_name, *labels = ui.operands()
         issue_name = expand_issue_name(issue_name)
