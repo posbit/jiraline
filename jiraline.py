@@ -637,7 +637,17 @@ def commandSearch(ui):
     if r.status_code == 200:
         response = json.loads(r.text)
         if '--table' not in ui:
+            terms = [_.lower() for _ in ui.operands()]
             for i in response.get('issues', []):
+                skip = bool(terms)
+                if terms:
+                    summary = i.get('fields', {}).get('summary', '').lower()
+                    for term in terms:
+                        if term in summary:
+                            skip = False
+                            break
+                if skip:
+                    continue
                 print_abbrev_issue_summary(i, ui)
         else:
             print('{:<7} | {:<50} | {:<20} | {:<19} | {:<20}'.format('Key','Summary','Assignee','Created','Status'))
