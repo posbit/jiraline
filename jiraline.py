@@ -459,6 +459,29 @@ def fetch_issue(issue_name):
         exit(1)
     return cached
 
+def show_issue(issue_name, ui, cached=None):
+    if cached is None:
+        cached = Cache(issue_name)
+    if '--field' not in ui:
+        displayBasicInformation(cached)
+        displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
+    elif '--pretty' in ui:
+        print(json.dumps(cached.response().get('fields', {}), indent=ui.get('--pretty')))
+    elif '--raw' in ui:
+        print(json.dumps(cached.response().get('fields', {})))
+    else:
+        fields = cached.response.get('fields', {})
+        for i, key in enumerate(real_fields):
+            if key == 'comment': continue
+            value = obtain(fields, *key.split('.'))
+            if key == 'assignee':
+                value = stringifyAssignee(value)
+            if value is None:
+                print('{} (undefined)'.format(key))
+            else:
+                print('{} = {}'.format(key, str(value).strip()))
+        displayComments(cached.response().get('fields', {}).get('comment', {}).get('comments', []))
+
 def expand_issue_name(issue_name, project=None):
     if issue_name.isdigit():
         issue_name = '{}-{}'.format((project if project is not None else settings.get('default_project')), issue_name)
@@ -547,47 +570,9 @@ def commandIssue(ui):
                 print('error: HTTP {}'.format(r.status_code))
                 exit(1)
     elif str(ui) == 'issue' and cached.is_cached():
-        if '--field' not in ui:
-            displayBasicInformation(cached)
-            displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
-        else:
-            fields = cached.raw()
-            real_fields = ('summary', 'description', 'comment', 'created',)
-            selected_fields = []
-            if '--field' in ui:
-                real_fields = [_[0] for _ in ui.get('-f')]
-                selected_fields = [_.split('.')[0] for _ in real_fields]
-            for i, key in enumerate(real_fields):
-                if key == 'comment': continue
-                value = fields.get(key)
-                if key == 'assignee':
-                    value = stringifyAssignee(value)
-                if value is None:
-                    print('{} (undefined)'.format(key))
-                else:
-                    print('{} = {}'.format(key, str(value).strip()))
-            displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
+        show_issue(issue_name, ui, cached)
     elif str(ui) == 'show' or str(ui) == 'issue':
-        cached = fetch_issue(issue_name)
-        if '--field' not in ui:
-            displayBasicInformation(cached)
-            displayComments(cached.get('fields', 'comment', default={}).get('comments', []))
-        elif '--pretty' in ui:
-            print(json.dumps(cached.response().get('fields', {}), indent=ui.get('--pretty')))
-        elif '--raw' in ui:
-            print(json.dumps(cached.response().get('fields', {})))
-        else:
-            fields = cached.response.get('fields', {})
-            for i, key in enumerate(real_fields):
-                if key == 'comment': continue
-                value = obtain(fields, *key.split('.'))
-                if key == 'assignee':
-                    value = stringifyAssignee(value)
-                if value is None:
-                    print('{} (undefined)'.format(key))
-                else:
-                    print('{} = {}'.format(key, str(value).strip()))
-            displayComments(cached.response().get('fields', {}).get('comment', {}).get('comments', []))
+        show_issue(issue_name, ui, fetch_issue(issue_name))
     elif str(ui) == 'label':
         issue_name, *labels = ui.operands()
         issue_name = expand_issue_name(issue_name)
