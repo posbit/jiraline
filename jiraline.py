@@ -566,6 +566,10 @@ def commandComment(ui):
         if cached.is_cached():
             fmt['issue_summary'] = cached.get('fields.summary', default=summary_not_available).strip()
             fmt['issue_description'] = cached.get('fields.description', default=description_not_available).strip()
+        if '--reply' in ui and cached.is_cached():
+            comments = cached.get('fields', 'comment', default={}).get('comments', [])
+            if comments:
+                fmt['text'] = '> {}'.format(comments[-1].get('body', ''))
         message = get_message_from_editor('issue_comment_message', fmt)
     if not message.strip():
         print('error: aborting due to empty message')

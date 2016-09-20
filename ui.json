@@ -118,6 +118,11 @@
                         "arguments": ["Git ref:str"],
                         "help": "use output of \"git show <ref>\" as base for the comment",
                         "conflicts": ["-m"]
+                    },
+                    {
+                        "short": "r",
+                        "long": "reply",
+                        "help": "display text of the last comment (if available) in comment template in editor"
                     }
                 ]
             },
