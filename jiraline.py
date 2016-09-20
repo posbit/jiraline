@@ -449,6 +449,7 @@ def fetch_issue(issue_name):
     if r.status_code == 200:
         response = json.loads(r.text)
         cached = Cache(issue_name)
+        cached.set('key', value=issue_name)
         for k, v in response.get('fields', {}).items():
             cached.set('fields', k, value=v)
         cached.store()
