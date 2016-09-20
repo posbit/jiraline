@@ -248,6 +248,21 @@ connection = Connection(settings)
 ################################################################################
 # Helper functions.
 #
+def get_last_active_issue_marker_path():
+    return os.path.expanduser(os.path.join('~', '.cache', 'jiraline', 'last_active_issue_marker'))
+
+def store_last_active_issue_marker(issue_name):
+    with open(get_last_active_issue_marker_path(), 'w') as ofstream:
+        ofstream.write(issue_name)
+
+def load_last_active_issue_marker():
+    pth = get_last_active_issue_marker_path()
+    if os.path.isfile(pth):
+        with open(pth) as ifstream:
+            return ifstream.read().strip()
+    print('error: no last active issue')
+    exit(1)
+
 def stringifyAssignee(assignee):
     return '{} <{}>'.format(
         assignee.get('displayName', ''),
@@ -495,6 +510,8 @@ def show_issue(issue_name, ui, cached=None):
         displayComments(cached.response().get('fields', {}).get('comment', {}).get('comments', []))
 
 def expand_issue_name(issue_name, project=None):
+    if issue_name == '-':
+        issue_name = load_last_active_issue_marker()
     if issue_name.isdigit():
         issue_name = '{}-{}'.format((project if project is not None else settings.get('default_project')), issue_name)
     return issue_name
@@ -522,6 +539,7 @@ def get_message_from_editor(template='', fmt={}):
 #
 def commandComment(ui):
     issue_name = expand_issue_name(ui.operands()[0])
+    store_last_active_issue_marker(issue_name)
     message = ""
     if "-m" in ui:
         message = ui.get("-m")
@@ -542,6 +560,7 @@ def commandComment(ui):
 
 def commandAssign(ui):
     issue_name = ui.operands()[0]
+    store_last_active_issue_marker(issue_name)
     user_name = ui.get('-u')
     assign = {'name': user_name}
     r = connection.put('/rest/api/2/issue/{}/assignee'.format(issue_name), json=assign)
@@ -556,6 +575,7 @@ def commandAssign(ui):
 def commandIssue(ui):
     ui = ui.down()
     issue_name = expand_issue_name(ui.operands()[0])
+    store_last_active_issue_marker(issue_name)
     cached = Cache(issue_name)
     if str(ui) == 'transition':
         if '--to' in ui:
@@ -679,6 +699,7 @@ def commandSearch(ui):
 def commandSlug(ui):
     ui = ui.down()
     issue_name = expand_issue_name(ui.operands()[0])
+    store_last_active_issue_marker(issue_name)
 
     cached = Cache(issue_name)
     issue_message = cached.get('fields', 'summary')
@@ -728,6 +749,7 @@ def commandSlug(ui):
 def commandEstimate(ui):
     ui = ui.down()
     issue_name = expand_issue_name(ui.operands()[0])
+    store_last_active_issue_marker(issue_name)
     estimation_time = ui.operands()[1]
 
     request_content = {

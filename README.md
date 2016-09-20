@@ -150,6 +150,18 @@ jiraline estimate IP-1345 "3h 15m"
 ```
 
 
+### Shortcuts
+
+Jiraline has a few shortcuts that can speed up working with issues.
+
+#### Using `-` as "last active issue"
+
+When specifying issue id in `comment`, `issue show` etc. commands `-` can be used as the id.
+Jiraline will expand it to mean "last active issue".
+Last active issue is an issue that has been specified last.
+Every command that requires a specific issue id updates the marker.
+
+
 ### Built-in help screens
 
 To display built-in help screens use `help` command (help screens are automatically
