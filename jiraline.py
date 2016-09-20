@@ -497,10 +497,9 @@ def show_issue(issue_name, ui, cached=None):
     elif '--raw' in ui:
         print(dump_issue(cached, ui))
     else:
-        fields = cached.response.get('fields', {})
-        for i, key in enumerate(real_fields):
+        for i, key in enumerate(map(lambda _: _[0], ui.get('-f'))):
             if key == 'comment': continue
-            value = obtain(fields, *key.split('.'))
+            value = cached.get('fields', key)
             if key == 'assignee':
                 value = stringifyAssignee(value)
             if value is None:
