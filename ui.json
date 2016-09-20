@@ -111,11 +111,18 @@
                         "short": "m",
                         "help": "comment message",
                         "arguments" : ["message:str"]
+                    },
+                    {
+                        "short": "r",
+                        "long": "ref",
+                        "arguments": ["Git ref:str"],
+                        "help": "use output of \"git show <ref>\" as base for the comment",
+                        "conflicts": ["-m"]
                     }
                 ]
             },
             "operands":{
-                "no" : [1,1]
+                "no" : [1, 1]
             }
         },
         "assign" : {

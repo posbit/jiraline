@@ -3,6 +3,7 @@
 import getpass
 import json
 import re
+import subprocess
 import sys
 import os
 
@@ -545,9 +546,20 @@ def commandComment(ui):
     if not message.strip():
         cached = Cache(issue_name)
         summary_not_available = '<summary not available>'
+        initial_comment_text = ''
+        if '--ref' in ui:
+            p = subprocess.Popen(('git', 'show', ui.get('-r')), stdout=subprocess.PIPE)
+            output, error = p.communicate()
+            output = output.decode('utf-8').strip()
+            git_exit_code = p.wait()
+            if git_exit_code != 0:
+                print('error: Git error')
+                exit(git_exit_code)
+            initial_comment_text = output
         fmt = {
             'issue_name': issue_name,
             'issue_summary': summary_not_available,
+            'text': initial_comment_text,
         }
         if cached.is_cached():
             fmt['issue_summary'] = cached.get('fields.summary', default=summary_not_available)
