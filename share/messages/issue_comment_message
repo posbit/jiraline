@@ -1,3 +1,7 @@
 
-# Type a comment.
+#
+# Type a comment for issue {issue_name}.
+#
+#   {issue_summary}
+#
 # Lines beginning with '#' will be ignored.

@@ -541,10 +541,18 @@ def commandComment(ui):
     issue_name = expand_issue_name(ui.operands()[0])
     store_last_active_issue_marker(issue_name)
     message = ""
-    if "-m" in ui:
+    if '-m' in ui:
         message = ui.get("-m")
     if not message.strip():
-        message = get_message_from_editor('issue_comment_message')
+        cached = Cache(issue_name)
+        summary_not_available = '<summary not available>'
+        fmt = {
+            'issue_name': issue_name,
+            'issue_summary': summary_not_available,
+        }
+        if cached.is_cached():
+            fmt['issue_summary'] = cached.get('fields.summary', default=summary_not_available)
+        message = get_message_from_editor('issue_comment_message', fmt)
     if not message.strip():
         print('error: aborting due to empty message')
         exit(1)
