@@ -546,6 +546,7 @@ def commandComment(ui):
     if not message.strip():
         cached = Cache(issue_name)
         summary_not_available = '<summary not available>'
+        description_not_available = '<description not available>'
         initial_comment_text = ''
         if '--ref' in ui:
             p = subprocess.Popen(('git', 'show', ui.get('-r')), stdout=subprocess.PIPE)
@@ -559,10 +560,12 @@ def commandComment(ui):
         fmt = {
             'issue_name': issue_name,
             'issue_summary': summary_not_available,
+            'issue_description': description_not_available,
             'text': initial_comment_text,
         }
         if cached.is_cached():
-            fmt['issue_summary'] = cached.get('fields.summary', default=summary_not_available)
+            fmt['issue_summary'] = cached.get('fields.summary', default=summary_not_available).strip()
+            fmt['issue_description'] = cached.get('fields.description', default=description_not_available).strip()
         message = get_message_from_editor('issue_comment_message', fmt)
     if not message.strip():
         print('error: aborting due to empty message')
