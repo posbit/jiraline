@@ -549,7 +549,7 @@ def commandComment(ui):
         description_not_available = '<description not available>'
         initial_comment_text = ''
         if '--ref' in ui:
-            p = subprocess.Popen(('git', 'show', ui.get('-r')), stdout=subprocess.PIPE)
+            p = subprocess.Popen(('git', 'show', ui.get('--ref')), stdout=subprocess.PIPE)
             output, error = p.communicate()
             output = output.decode('utf-8').strip()
             git_exit_code = p.wait()

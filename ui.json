@@ -113,7 +113,7 @@
                         "arguments" : ["message:str"]
                     },
                     {
-                        "short": "r",
+                        "short": "R",
                         "long": "ref",
                         "arguments": ["Git ref:str"],
                         "help": "use output of \"git show <ref>\" as base for the comment",
