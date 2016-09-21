@@ -4,6 +4,6 @@
 #
 #   {issue_summary}
 #
-#   {issue_description}
+{issue_description}
 #
 # Lines beginning with '#' will be ignored.
