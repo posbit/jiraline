@@ -393,7 +393,7 @@ def sluggify(issue_message):
 def displayBasicInformation(data):
     print('issue {}'.format(data.get('key')))
 
-    fields = lambda *path, default=None: data.get('fields', *path, default=default)
+    fields = lambda *path, default=None: (data.get('fields', *path, default=default) or default)
 
     created = fields('created')
     if created:
