@@ -270,6 +270,31 @@ def stringifyAssignee(assignee):
         assignee.get('emailAddress', ''),
     ).strip()
 
+def stringify_reporter(person):
+    display_name = person.get('displayName', '').strip()
+    user_name = person.get('key', '').strip()
+    email_address = person.get('emailAddress', '').strip()
+    fmt = '(unknown)'
+    if (not display_name) and (not user_name) and (not email_address):
+        pass
+    elif display_name and user_name and email_address:
+        fmt = '{0} @{1} <{2}>'
+    elif display_name and user_name and (not email_address):
+        fmt = '{0} @{1}'
+    elif display_name and (not user_name) and email_address:
+        fmt = '{0} <{2}>'
+    elif (not display_name) and user_name and email_address:
+        fmt = '@{1} <{2}>'
+    elif display_name and (not user_name) and (not email_address):
+        fmt = '{0}'
+    elif (not display_name) and (not user_name) and email_address:
+        fmt = '<{2}>'
+    elif (not display_name) and user_name and (not email_address):
+        fmt = '@{1}'
+    else:
+        pass
+    return fmt.format(display_name, user_name, email_address)
+
 def transition_to(issue_name, to_id):
     transition = {
         "transition": {
@@ -394,6 +419,10 @@ def displayBasicInformation(data):
     print('issue {}'.format(data.get('key')))
 
     fields = lambda *path, default=None: (data.get('fields', *path, default=default) or default)
+
+    reporter = fields('reporter')
+    if reporter:
+        print('Reporter: {}'.format(stringify_reporter(reporter)))
 
     created = fields('created')
     if created:
