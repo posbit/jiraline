@@ -827,6 +827,30 @@ def commandEstimate(ui):
         print('error: other error: {}'.format(r.status_code))
         exit(1)
 
+def commandPin(ui):
+    jiraline_config_directory = os.path.expanduser(os.path.join('~', '.config', 'jiraline'))
+    if not os.path.isdir(jiraline_config_directory):
+        os.makedirs(jiraline_config_directory, exist_ok=True)
+
+    pins_path = os.path.join(jiraline_config_directory, 'pinned.json')
+    pins = {}
+    if os.path.isfile(pins_path):
+        with open(pins_path) as ifstream:
+            pins = json.loads(ifstream.read())
+
+    if '--un' in ui:
+        issue_name = expand_issue_name(ui.get('--un'))
+        del pins[issue_name]
+    elif ui.operands():
+        pins[expand_issue_name(ui.operands()[0])] = (ui.get('-m') or '').strip()
+    else:
+        for k in sorted(pins.keys()):
+            note = pins[k]
+            print('{}{}'.format(colorise('yellow', k), ((': ' + note) if note else '')))
+
+    with open(pins_path, 'w') as ofstream:
+        ofstream.write(json.dumps(pins))
+
 
 ################################################################################
 # Program's entry point.
@@ -861,5 +885,6 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandIssue,
     commandSearch,
     commandSlug,
-    commandEstimate
+    commandEstimate,
+    commandPin
 )

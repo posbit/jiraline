@@ -360,6 +360,30 @@
             "operands": {
                 "no": [1, 1]
             }
+        },
+        "pin": {
+            "doc": {
+                "help": "Pin issues for quick, private todos"
+            },
+            "options": {
+                "local": [
+                    {
+                        "short": "u",
+                        "long": "un",
+                        "arguments": ["issue name:str"],
+                        "help": "unpin issue"
+                    },
+                    {
+                        "short": "m",
+                        "arguments": ["message text:str"],
+                        "help": "add message to pin",
+                        "conflicts": ["--un"]
+                    }
+                ]
+            },
+            "operands": {
+                "no": [0, 1]
+            }
         }
     },
     "operands": {
