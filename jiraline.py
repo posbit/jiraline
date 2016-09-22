@@ -416,7 +416,7 @@ def sluggify(issue_message):
     return '-'.join(re.compile('[^ a-zA-Z0-9_]').sub(' ', unidecode.unidecode(issue_message).lower()).split())
 
 def displayBasicInformation(data):
-    print('issue {}'.format(data.get('key')))
+    print(colorise('yellow', 'issue {}'.format(data.get('key'))))
 
     fields = lambda *path, default=None: (data.get('fields', *path, default=default) or default)
 
@@ -426,7 +426,7 @@ def displayBasicInformation(data):
 
     created = fields('created')
     if created:
-        print('Created {}'.format(created.replace('T', ' ').replace('+', ' +')))
+        print('Created:  {}'.format(created.replace('T', ' ').replace('+', ' +')))
 
     summary = fields('summary')
     if summary:
@@ -434,16 +434,18 @@ def displayBasicInformation(data):
 
     description = fields('description', default='').strip()
     if description:
-        print('\nDescription\n')
+        print('\n{}\n'.format(colorise('white', 'Description')))
         print('\n'.join(['    {}'.format(_) for _ in description.splitlines()]))
 
 def displayComments(comments):
     if comments:
-        print("\nComments:")
+        print('\n{}'.format(colorise('white', 'Comments')))
         for c in comments:
-            print('----------------------------------')
-            print('Author: {} | Date: {}'.format(c["updateAuthor"]["displayName"],c["created"]))
-            print('{}'.format(c["body"]))
+            print()
+            print('Author: {}'.format(stringify_reporter(c.get('updateAuthor', {}))))
+            print('Date:   {}'.format(c.get('created', '').replace('T', ' ').replace('+', ' +')))
+            comment_lines = map(lambda s: ('  ' + s), map(lambda s: s.strip(), c.get('body', '').splitlines()))
+            print('\n{}'.format('\n'.join(comment_lines)))
 
 def print_abbrev_issue_summary(issue, ui):
     key = issue.get('key', '<undefined>')
