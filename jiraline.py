@@ -677,6 +677,9 @@ def commandAssign(ui):
 
 def commandIssue(ui):
     ui = ui.down()
+    issue_name, cached = None, None
+    if str(ui) == 'issue':
+        issue_name, cached = get_issue_name_cache_pair(ui)
     if str(ui) == 'transition':
         issue_name, cached = get_issue_name_cache_pair(ui)
         if '--to' in ui:
@@ -703,7 +706,6 @@ def commandIssue(ui):
                 print('error: HTTP {}'.format(r.status_code))
                 exit(1)
     elif str(ui) == 'issue' and cached.is_cached():
-        issue_name, cached = get_issue_name_cache_pair(ui)
         show_issue(issue_name, ui, cached)
     elif str(ui) == 'show' or str(ui) == 'issue':
         issue_name, cached = get_issue_name_cache_pair(ui)
