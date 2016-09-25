@@ -487,8 +487,8 @@ def displayComments(comments):
             print()
             print('Author: {}'.format(stringify_reporter(c.get('updateAuthor', {}))))
             print('Date:   {}'.format(c.get('created', '').replace('T', ' ').replace('+', ' +')))
-            comment_lines = map(lambda s: ('  ' + s), map(lambda s: s.strip(), c.get('body', '').splitlines()))
-            print('\n{}'.format('\n'.join(comment_lines)))
+            comment_body = '\n'.join(map(lambda s: s.strip(), c.get('body', '').splitlines()))
+            print(get_nice_wall_of_text(comment_body, indent='  '))
 
 def print_abbrev_issue_summary(issue, ui):
     key = issue.get('key', '<undefined>')
