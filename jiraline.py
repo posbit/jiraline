@@ -724,7 +724,7 @@ def commandIssue(ui):
             for label in labels:
                 if label not in known_labels:
                     print('{}: unknown label: {}'.format(colorise('red', 'error'), colorise_repr('white', label)))
-                    print('{}: to create this label run: jiraline issue label new {}'.format(colorise('light_cyan', 'note'), label))
+                    print('{}: to create this label run: "jiraline issue label new {}"'.format(colorise('light_cyan', 'note'), label))
                     exit(1)
             for label in labels:
                 add_label(issue_name, label)
