@@ -473,6 +473,7 @@ def displayBasicInformation(data):
 
     summary = fields('summary')
     if summary:
+        print()
         print(get_nice_wall_of_text(summary))
 
     description = fields('description', default='').strip()
