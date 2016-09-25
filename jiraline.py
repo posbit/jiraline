@@ -6,6 +6,7 @@ import re
 import subprocess
 import sys
 import os
+import textwrap
 
 import clap
 import requests
@@ -454,6 +455,9 @@ def get_issue_name_cache_pair(ui):
     cached = Cache(issue_name)
     return (issue_name, cached)
 
+def get_nice_wall_of_text(s, indent='    '):
+    return textwrap.indent('\n'.join(textwrap.wrap(s)), indent)
+
 def displayBasicInformation(data):
     print(colorise('yellow', 'issue {}'.format(data.get('key'))))
 
@@ -469,12 +473,12 @@ def displayBasicInformation(data):
 
     summary = fields('summary')
     if summary:
-        print('\n    {}'.format(summary))
+        print(get_nice_wall_of_text(summary))
 
     description = fields('description', default='').strip()
     if description:
         print('\n{}\n'.format(colorise('white', 'Description')))
-        print('\n'.join(['    {}'.format(_) for _ in description.splitlines()]))
+        print(get_nice_wall_of_text(description))
 
 def displayComments(comments):
     if comments:
