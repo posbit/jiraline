@@ -739,12 +739,15 @@ def commandIssue(ui):
                 print(label)
     elif str(ui) == 'priority':
         issue_name, id = ui.operands()
+        store_last_active_issue_marker(issue_name)
         set_priority(issue_name, id)
     elif str(ui) == 'type':
         issue_name, type_name = ui.operands()
+        store_last_active_issue_marker(issue_name)
         set_type(issue_name, type_name)
     elif str(ui) == 'customfield-executor':
         issue_name, message = ui.operands()
+        store_last_active_issue_marker(issue_name)
         set_customfield_executor(issue_name, message)
 
 
