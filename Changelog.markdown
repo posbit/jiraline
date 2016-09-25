@@ -8,6 +8,7 @@ Changelog is updated as features and fixes are added to the code.
 ## From 0.1.2 to 0.2.0
 
 - *incompat*, *enhancement*: move configuration file from `~/.jiraline` to `~/.config/jiraline/config.json`
+- *feature*: added label management commands (to avoid typos): `issue label (new|rm|ls)`
 
 
 ## From 0.1.1 to 0.1.2

@@ -279,6 +279,21 @@ def load_last_active_issue_marker():
     print('error: no last active issue')
     exit(1)
 
+def get_known_labels_path():
+    return os.path.expanduser(os.path.join('~', '.config', 'jiraline', 'labels.json'))
+
+def load_known_labels_list():
+    labels = []
+    pth = get_known_labels_path()
+    if os.path.isfile(pth):
+        with open(pth) as ifstream:
+            labels = json.loads(ifstream.read())
+    return labels
+
+def store_known_labels_list(labels):
+    with open(get_known_labels_path(), 'w') as ofstream:
+        ofstream.write(json.dumps(labels))
+
 def stringifyAssignee(assignee):
     return '{} <{}>'.format(
         assignee.get('displayName', ''),
@@ -427,8 +442,17 @@ def colorise(color, string):
         string = (colored.fg(color) + str(string) + colored.attr('reset'))
     return string
 
+def colorise_repr(color, string):
+    return "'{}'".format(colorise(color, repr(string)[1:-1]))
+
 def sluggify(issue_message):
     return '-'.join(re.compile('[^ a-zA-Z0-9_]').sub(' ', unidecode.unidecode(issue_message).lower()).split())
+
+def get_issue_name_cache_pair(ui):
+    issue_name = expand_issue_name(ui.operands()[0])
+    store_last_active_issue_marker(issue_name)
+    cached = Cache(issue_name)
+    return (issue_name, cached)
 
 def displayBasicInformation(data):
     print(colorise('yellow', 'issue {}'.format(data.get('key'))))
@@ -653,10 +677,8 @@ def commandAssign(ui):
 
 def commandIssue(ui):
     ui = ui.down()
-    issue_name = expand_issue_name(ui.operands()[0])
-    store_last_active_issue_marker(issue_name)
-    cached = Cache(issue_name)
     if str(ui) == 'transition':
+        issue_name, cached = get_issue_name_cache_pair(ui)
         if '--to' in ui:
             for to_id in ui.get('-t'):
                 transition_to(issue_name, *to_id)
@@ -681,14 +703,40 @@ def commandIssue(ui):
                 print('error: HTTP {}'.format(r.status_code))
                 exit(1)
     elif str(ui) == 'issue' and cached.is_cached():
+        issue_name, cached = get_issue_name_cache_pair(ui)
         show_issue(issue_name, ui, cached)
     elif str(ui) == 'show' or str(ui) == 'issue':
+        issue_name, cached = get_issue_name_cache_pair(ui)
         show_issue(issue_name, ui, fetch_issue(issue_name))
     elif str(ui) == 'label':
-        issue_name, *labels = ui.operands()
-        issue_name = expand_issue_name(issue_name)
-        for label in labels:
-            add_label(issue_name, label)
+        ui = ui.down()
+        if str(ui) == 'label':
+            issue_name, *labels = ui.operands()
+            issue_name = expand_issue_name(issue_name)
+            known_labels = load_known_labels_list()
+            for label in labels:
+                if label not in known_labels:
+                    print('{}: unknown label: {}'.format(colorise('red', 'error'), colorise_repr('white', label)))
+                    print('{}: to create this label run: jiraline issue label new {}'.format(colorise('light_cyan', 'note'), label))
+                    exit(1)
+            for label in labels:
+                add_label(issue_name, label)
+        elif str(ui) == 'new':
+            labels = ui.operands()
+            known_labels = set(load_known_labels_list())
+            for label in labels:
+                known_labels.add(label)
+            store_known_labels_list(list(known_labels))
+        elif str(ui) == 'rm':
+            labels = ui.operands()
+            known_labels = set(load_known_labels_list())
+            for label in labels:
+                known_labels.remove(label)
+            store_known_labels_list(list(known_labels))
+        elif str(ui) == 'ls':
+            known_labels = load_known_labels_list()
+            for label in sorted(known_labels):
+                print(label)
     elif str(ui) == 'priority':
         issue_name, id = ui.operands()
         set_priority(issue_name, id)

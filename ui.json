@@ -233,8 +233,43 @@
                     "doc": {
                         "help": "Set, add or remove label from issue",
                         "usage": [
-                            "issue label <issue-name> \"<label>\""
+                            "issue label <issue-name> <label>..."
                         ]
+                    },
+                    "commands": {
+                        "new": {
+                            "doc": {
+                                "help": "Create new labels",
+                                "usage": [
+                                    "issue label new <label>..."
+                                ]
+                            },
+                            "operands": {
+                                "no": [1]
+                            }
+                        },
+                        "rm": {
+                            "doc": {
+                                "help": "Remove labels",
+                                "usage": [
+                                    "issue label rm <label>..."
+                                ]
+                            },
+                            "operands": {
+                                "no": [1]
+                            }
+                        },
+                        "ls": {
+                            "doc": {
+                                "help": "List labels",
+                                "usage": [
+                                    "issue label ls"
+                                ]
+                            },
+                            "operands": {
+                                "no": [0, 0]
+                            }
+                        }
                     },
                     "operands": {
                         "no": [2]
