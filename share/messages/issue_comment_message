@@ -2,7 +2,7 @@
 #
 # Type a comment for issue {issue_name}.
 #
-#   {issue_summary}
+{issue_summary}
 #
 {issue_description}
 #
