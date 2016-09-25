@@ -408,7 +408,7 @@ def set_customfield_executor(issue_name, message):
         exit(1)
 
 def colorise(color, string):
-    if colored:
+    if colored and sys.stdout.isatty():
         string = (colored.fg(color) + str(string) + colored.attr('reset'))
     return string
 
