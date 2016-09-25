@@ -94,10 +94,11 @@ def obtain(dictionary, *path, error=False, default=None):
     return (value if found else default)
 
 class Cache:
-    def __init__(self, issue_key):
+    def __init__(self, issue_key, lazy=False):
         self._issue_key = issue_key
         self._data = {}
-        self.load()
+        if not lazy:
+            self.load()
 
     @staticmethod
     def dir():
@@ -244,6 +245,16 @@ class Connection:
         return requests.post(self.url(url), auth=self._auth(), **kwargs)
 
 connection = Connection(settings)
+
+
+class JIRALineException(Exception):
+    pass
+
+class IssueException(JIRALineException):
+    pass
+
+class IssueNotFoundException(IssueException):
+    pass
 
 
 ################################################################################
@@ -490,7 +501,7 @@ def fetch_summary(issue_name):
         print('error: HTTP {}'.format(r.status_code))
         exit(1)
 
-def fetch_issue(issue_name):
+def fetch_issue(issue_name, fatal=True):
     request_content = {}
     r = connection.get('/rest/api/2/issue/{}'.format(issue_name), params=request_content)
     if r.status_code == 200:
@@ -501,11 +512,18 @@ def fetch_issue(issue_name):
             cached.set('fields', k, value=v)
         cached.store()
     elif r.status_code == 404:
-        print("error: the requested issue is not found or the user does not have permission to view it.")
-        exit(1)
+        msg = 'the requested issue is not found or the user does not have permission to view it.'
+        if fatal:
+            print('error: {}'.format(msg))
+            exit(1)
+        else:
+            raise IssueNotFoundException(issue_name, msg)
     else:
-        print('error: HTTP {}'.format(r.status_code))
-        exit(1)
+        if fatal:
+            print('error: HTTP {}'.format(r.status_code))
+            exit(1)
+        else:
+            raise IssueException(issue_name, r.status_code)
     return cached
 
 def dump_issue(cached, ui):
@@ -827,6 +845,7 @@ def commandEstimate(ui):
         print('error: other error: {}'.format(r.status_code))
         exit(1)
 
+
 def commandPin(ui):
     jiraline_config_directory = os.path.expanduser(os.path.join('~', '.config', 'jiraline'))
     if not os.path.isdir(jiraline_config_directory):
@@ -850,6 +869,44 @@ def commandPin(ui):
 
     with open(pins_path, 'w') as ofstream:
         ofstream.write(json.dumps(pins))
+
+
+def colorise_percentage(s, percentage):
+    color = 'white'
+    colors = (
+        (98, 'dark_green'),
+        (90, 'green'),
+        (85, 'light_green'),
+        (75, 'pale_green_1b'),
+        (60, 'dark_olive_green_1a'),
+        (50, 'light_yellow'),
+        (40, 'green_yellow'),
+        (30, 'yellow_4b'),
+        (20, 'yellow'),
+        (10, 'yellow_4a'),
+        (2, 'red'),
+        (0, 'dark_red_1'),
+    )
+    for pc, clr in colors:
+        if percentage >= pc:
+            color = clr
+            break
+    return colorise(color, str(s))
+
+def commandFetch(ui):
+    ui = ui.down()
+    total_isues_to_fetch = len(ui.operands())
+    for i, issue_name in enumerate(ui.operands()):
+        issue_name = expand_issue_name(issue_name)
+        if '--lazy' in ui and Cache(issue_name, lazy=True).is_cached():
+            continue
+        try:
+            if '--verbose' in ui:
+                percent_complete = round(((i+1)/total_isues_to_fetch*100), 2)
+                print('fetching {} ({}/{} ~{}%)'.format(colorise('yellow', issue_name), i+1, total_isues_to_fetch, colorise_percentage(percent_complete, percent_complete)))
+            fetch_issue(issue_name, fatal=False)
+        except IssueException:
+            print('{}: failed to fetch issue {}'.format(colorise('red_1', 'warning'), colorise('yellow', issue_name)))
 
 
 ################################################################################
@@ -886,5 +943,6 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandSearch,
     commandSlug,
     commandEstimate,
-    commandPin
+    commandPin,
+    commandFetch,
 )

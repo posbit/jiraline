@@ -387,6 +387,23 @@
                     "--un": [0, 0]
                 }
             }
+        },
+        "fetch" : {
+            "doc": {
+                "help": "Fetch issues to local cache"
+            },
+            "options": {
+                "local": [
+                    {
+                        "long": "lazy",
+                        "short": "l",
+                        "help": "do not fetch issues if they are already cached"
+                    }
+                ]
+            },
+            "operands":{
+                "no" : [1]
+            }
         }
     },
     "operands": {
