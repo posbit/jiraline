@@ -206,7 +206,7 @@ jiraline help -v issue transition --to
 
 # Settings
 
-In file `~/.jiraline` put the following contents:
+In file `~/.config/jiraline/config.json` put the following contents:
 
 
 ```
@@ -312,7 +312,7 @@ Example:
 ~]$ jiraline i sh 42
 ```
 
-If `default_project` key in `~/.jiraline` is set to `JL` the above lines are equivalent.
+If `default_project` key in configuration file is set to `JL` the above lines are equivalent.
 Example configuration:
 
 ```

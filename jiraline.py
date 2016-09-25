@@ -155,13 +155,17 @@ class Settings:
     def __getitem__(self, key):
         return self._settings[key]
 
+    @staticmethod
+    def get_settings_path():
+        return os.path.expanduser(os.path.join('~', '.config', 'jiraline', 'config.json'))
+
     # Maintenance API.
     def load(self):
         self._settings = {}
-        if not os.path.isfile(os.path.expanduser("~/.jiraline")):
+        if not os.path.isfile(Settings.get_settings_path()):
             return self
         try:
-            with open(os.path.expanduser("~/.jiraline")) as ifstream:
+            with open(Settings.get_settings_path()) as ifstream:
                 self._settings = json.loads(ifstream.read())
         except json.decoder.JSONDecodeError as e:
             print('error: invalid settings format: {}'.format(e))

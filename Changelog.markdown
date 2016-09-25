@@ -5,6 +5,11 @@ Changelog is updated as features and fixes are added to the code.
 
 ----
 
+## From 0.1.2 to 0.2.0
+
+- *incompat*, *enhancement*: move configuration file from `~/.jiraline` to `~/.config/jiraline/config.json`
+
+
 ## From 0.1.1 to 0.1.2
 
 - *feature*: Jiraline saves key of last active issue, and provides `-` as a shortcut for it;
