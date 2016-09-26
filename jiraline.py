@@ -262,6 +262,18 @@ class IssueNotFoundException(IssueException):
     pass
 
 
+COLOR_LABEL = 'white'
+COLOR_ISSUE_KEY = 'yellow'
+COLOR_ASSIGNEE = 'light_blue'
+COLOR_PRIORITY = 'green'
+COLOR_STATUS = 'cyan'
+COLOR_SHOW_SECTION = 'white'
+
+COLOR_NOTE = 'light_cyan'
+COLOR_ERROR = 'red'
+COLOR_WARNING = 'red_1'
+
+
 ################################################################################
 # Helper functions.
 #
@@ -459,7 +471,7 @@ def get_nice_wall_of_text(s, indent='    '):
     return textwrap.indent('\n'.join(textwrap.wrap(s)), indent)
 
 def displayBasicInformation(data):
-    print(colorise('yellow', 'issue {}'.format(data.get('key'))))
+    print(colorise(COLOR_ISSUE_KEY, 'issue {}'.format(data.get('key'))))
 
     fields = lambda *path, default=None: (data.get('fields', *path, default=default) or default)
 
@@ -478,12 +490,12 @@ def displayBasicInformation(data):
 
     description = fields('description', default='').strip()
     if description:
-        print('\n{}\n'.format(colorise('white', 'Description')))
+        print('\n{}\n'.format(colorise(COLOR_SHOW_SECTION, 'Description')))
         print(get_nice_wall_of_text(description))
 
 def displayComments(comments):
     if comments:
-        print('\n{}'.format(colorise('white', 'Comments')))
+        print('\n{}'.format(colorise(COLOR_SHOW_SECTION, 'Comments')))
         for c in comments:
             print()
             print('Author: {}'.format(stringify_reporter(c.get('updateAuthor', {}))))
@@ -496,22 +508,22 @@ def print_abbrev_issue_summary(issue, ui):
     fields = issue.get('fields', {})
     summary = fields.get('summary', '')
     if colored:
-        key = colorise('yellow', key)
+        key = colorise(COLOR_ISSUE_KEY, key)
 
     formatted_line = '{} {}'.format(key, summary)
     if '--verbose' in ui:
         assignee_string = 'unassigned'
         assignee = fields.get('assignee', {})
         if assignee:
-            assignee = colorise('light_blue', '{}'.format(stringifyAssignee(assignee)))
-        assignee_string = colorise('light_blue', 'assignee: {}'.format(assignee))
+            assignee = colorise(COLOR_ASSIGNEE, '{}'.format(stringifyAssignee(assignee)))
+        assignee_string = colorise(COLOR_ASSIGNEE, 'assignee: {}'.format(assignee))
         priority = fields.get('priority', {}).get('name')
-        priority_string = colorise('green', priority)
+        priority_string = colorise(COLOR_PRIORITY, priority)
         formatted_line = '{}'
         formats = [key]
         if '--status' not in ui:
             formatted_line +=  ' [{}/{}]'
-            formats.append(colorise('cyan', '{}:{}'.format(fields.get('status', {}).get('id', 0), fields.get('status', {}).get('name', ''))))
+            formats.append(colorise(COLOR_STATUS, '{}:{}'.format(fields.get('status', {}).get('id', 0), fields.get('status', {}).get('name', ''))))
             formats.append(priority_string)
         formatted_line += ' {}'
         formats.append(summary)
@@ -723,10 +735,12 @@ def commandIssue(ui):
             known_labels = load_known_labels_list()
             for label in labels:
                 if label not in known_labels:
-                    print('{}: unknown label: {}'.format(colorise('red', 'error'), colorise_repr('white', label)))
-                    print('{}: to create this label run: "jiraline issue label new {}"'.format(colorise('light_cyan', 'note'), label))
+                    print('{}: unknown label: {}'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, label)))
+                    print('{}: to create this label run: "jiraline issue label new {}"'.format(colorise(COLOR_NOTE, 'note'), label))
                     exit(1)
             for label in labels:
+                if '--verbose' in ui:
+                    print('applying label {}'.format(colorise_repr(COLOR_LABEL, label)))
                 add_label(issue_name, label)
         elif str(ui) == 'new':
             labels = ui.operands()
@@ -927,7 +941,7 @@ def commandPin(ui):
     else:
         for k in sorted(pins.keys()):
             note = pins[k]
-            print('{}{}'.format(colorise('yellow', k), ((': ' + note) if note else '')))
+            print('{}{}'.format(colorise(COLOR_ISSUE_KEY, k), ((': ' + note) if note else '')))
 
     with open(pins_path, 'w') as ofstream:
         ofstream.write(json.dumps(pins))
@@ -965,10 +979,10 @@ def commandFetch(ui):
         try:
             if '--verbose' in ui:
                 percent_complete = round(((i+1)/total_isues_to_fetch*100), 2)
-                print('fetching {} ({}/{} ~{}%)'.format(colorise('yellow', issue_name), i+1, total_isues_to_fetch, colorise_percentage(percent_complete, percent_complete)))
+                print('fetching {} ({}/{} ~{}%)'.format(colorise(COLOR_ISSUE_KEY, issue_name), i+1, total_isues_to_fetch, colorise_percentage(percent_complete, percent_complete)))
             fetch_issue(issue_name, fatal=False)
         except IssueException:
-            print('{}: failed to fetch issue {}'.format(colorise('red_1', 'warning'), colorise('yellow', issue_name)))
+            print('{}: failed to fetch issue {}'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ISSUE_KEY, issue_name)))
 
 
 ################################################################################
