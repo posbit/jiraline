@@ -483,6 +483,10 @@ def displayBasicInformation(data):
     if created:
         print('Created:  {}'.format(created.replace('T', ' ').replace('+', ' +')))
 
+    labels = fields('labels')
+    if labels:
+        print('Labels:   {}'.format(', '.join(map(lambda s: colorise(COLOR_LABEL, s), labels))))
+
     summary = fields('summary')
     if summary:
         print()
