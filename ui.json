@@ -439,6 +439,14 @@
             "operands":{
                 "no" : [1]
             }
+        },
+        "shortlog": {
+            "doc": {
+                "help": "Display short, local log of events Jiraline recorded"
+            },
+            "operands": {
+                "no": [0, 0]
+            }
         }
     },
     "operands": {

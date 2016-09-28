@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import datetime
 import getpass
 import json
 import re
@@ -631,6 +632,71 @@ def get_message_from_editor(template='', fmt={}):
         message = ''.join([l for l in message_lines if not l.lstrip().startswith('#')]).strip()
     return message
 
+def get_shortlog_path():
+    return os.path.expanduser(os.path.join('~', '.local', 'log', 'jiraline'))
+
+def timestamp(dt=None):
+    return (dt or datetime.datetime.now()).timestamp()
+
+def read_shortlog():
+    pth = get_shortlog_path()
+    if not os.path.isdir(pth):
+        os.makedirs(pth)
+    shortlog = []
+    shortlog_path = os.path.join(pth, 'shortlog.json')
+    if os.path.isfile(shortlog_path):
+        with open(shortlog_path) as ifstream:
+            shortlog = json.loads(ifstream.read())
+    return shortlog
+
+def append_shortlog_event(issue_name, log_content):
+    issue_log_name = '{}.{}.json'.format(timestamp(), issue_name)
+    pth = get_shortlog_path()
+    if not os.path.isdir(pth):
+        os.makedirs(pth)
+    shortlog = read_shortlog()
+    log_content['issue'] = issue_name
+    shortlog.append(log_content)
+    with open(os.path.join(pth, 'shortlog.json'), 'w') as ofstream:
+        ofstream.write(json.dumps(shortlog))
+
+def add_shortlog_event_transition(issue_name, to):
+    append_shortlog_event(issue_name, log_content = {
+        'event': 'transition',
+        'parameters': {
+            'to': to,
+        },
+    })
+
+def add_shortlog_event_fetch(issue_name):
+    append_shortlog_event(issue_name, log_content = {
+        'event': 'fetch',
+        'parameters': {},
+    })
+
+def add_shortlog_event_show(issue_name):
+    append_shortlog_event(issue_name, log_content = {
+        'event': 'show',
+        'parameters': {},
+    })
+
+def add_shortlog_event_slug(issue_name, slug):
+    append_shortlog_event(issue_name, log_content = {
+        'event': 'slug',
+        'parameters': {
+            'slug': slug,
+        },
+    })
+
+def add_shortlog_event_label(issue_name, labels):
+    append_shortlog_event(issue_name, log_content = {
+        'event': 'label-add',
+        'parameters': {
+            'labels': labels,
+        },
+    })
+
+
 
 ################################################################################
 # Commands.
@@ -706,6 +772,7 @@ def commandIssue(ui):
         if '--to' in ui:
             for to_id in ui.get('-t'):
                 transition_to(issue_name, *to_id)
+                add_shortlog_event_transition(issue_name, *to_id)
         else:
             r = connection.get('/rest/api/2/issue/{}/transitions'.format(issue_name))
             if r.status_code == 200:
@@ -727,9 +794,11 @@ def commandIssue(ui):
                 print('error: HTTP {}'.format(r.status_code))
                 exit(1)
     elif str(ui) == 'issue' and cached.is_cached():
+        add_shortlog_event_show(issue_name)
         show_issue(issue_name, ui, cached)
     elif str(ui) == 'show' or str(ui) == 'issue':
         issue_name, cached = get_issue_name_cache_pair(ui)
+        add_shortlog_event_show(issue_name)
         show_issue(issue_name, ui, fetch_issue(issue_name))
     elif str(ui) == 'label':
         ui = ui.down()
@@ -742,6 +811,7 @@ def commandIssue(ui):
                     print('{}: unknown label: {}'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, label)))
                     print('{}: to create this label run: "jiraline issue label new {}"'.format(colorise(COLOR_NOTE, 'note'), label))
                     exit(1)
+            add_shortlog_event_label(issue_name, labels)
             for label in labels:
                 if '--verbose' in ui:
                     print('applying label {}'.format(colorise_repr(COLOR_LABEL, label)))
@@ -888,6 +958,8 @@ def commandSlug(ui):
             print('error: required parameter not found: {}'.format(str(e)))
             exit(1)
 
+    add_shortlog_event_slug(issue_name, issue_slug)
+
     if '--git-branch' in ui:
         r = os.system('git branch {0}'.format(issue_slug))
         r = (r >> 8)
@@ -990,6 +1062,14 @@ def commandFetch(ui):
             print('{}: failed to fetch issue {}'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ISSUE_KEY, issue_name)))
 
 
+def commandShortlog(ui):
+    ui = ui.down()
+    shortlog = read_shortlog()
+    shortlog.reverse()
+    for event in shortlog:
+        print(event)
+
+
 ################################################################################
 # Program's entry point.
 #
@@ -1026,4 +1106,5 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandEstimate,
     commandPin,
     commandFetch,
+    commandShortlog,
 )
