@@ -656,6 +656,7 @@ def append_shortlog_event(issue_name, log_content):
         os.makedirs(pth)
     shortlog = read_shortlog()
     log_content['issue'] = issue_name
+    log_content['timestamp'] = timestamp()
     shortlog.append(log_content)
     with open(os.path.join(pth, 'shortlog.json'), 'w') as ofstream:
         ofstream.write(json.dumps(shortlog))
