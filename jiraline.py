@@ -859,6 +859,7 @@ def commandSlug(ui):
     cached = Cache(issue_name)
     issue_message = cached.get('fields', 'summary')
     if not issue_message:
+        print('{}: message for issue {} not available, fetching'.format(colorise(COLOR_WARNING, 'warning'), colorise_repr(COLOR_ISSUE_KEY, issue_name)))
         issue_message = fetch_summary(issue_name)
         cached.set('fields', 'summary', value=issue_message)
         cached.store()
