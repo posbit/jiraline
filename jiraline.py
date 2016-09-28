@@ -697,6 +697,14 @@ def add_shortlog_event_label(issue_name, labels):
         },
     })
 
+def add_shortlog_event_comment(issue_name, comment):
+    append_shortlog_event(issue_name, log_content = {
+        'event': 'comment',
+        'parameters': {
+            'comment': comment,
+        },
+    })
+
 
 
 ################################################################################
@@ -742,6 +750,7 @@ def commandComment(ui):
     comment = {
         'body': message,
     }
+    add_shortlog_event_comment(issue_name, message)
     r = requests.post('https://{}.atlassian.net/rest/api/2/issue/{}/comment'.format(settings.get('domain'), issue_name),
                       json=comment,
                       auth=settings.credentials())
