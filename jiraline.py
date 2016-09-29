@@ -267,7 +267,7 @@ COLOR_LABEL = 'white'
 COLOR_ISSUE_KEY = 'yellow'
 COLOR_ASSIGNEE = 'light_blue'
 COLOR_PRIORITY = 'green'
-COLOR_STATUS = 'cyan'
+COLOR_STATUS = 'light_green'
 COLOR_SHOW_SECTION = 'white'
 
 COLOR_NOTE = 'light_cyan'
