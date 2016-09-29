@@ -1077,7 +1077,27 @@ def commandShortlog(ui):
     shortlog = read_shortlog()
     shortlog.reverse()
     for event in shortlog:
-        print(event)
+        event_name = event['event']
+        event_description = event['parameters']
+        if event_name == 'show':
+            event_description = ''
+        elif event_name == 'slug':
+            event_description = 'sluggified to {}'.format(colorise_repr(COLOR_LABEL, event['parameters']['slug']))
+        elif event_name == 'transition':
+            event_description = 'to status {}'.format(colorise_repr(COLOR_STATUS, event['parameters']['to']))
+        elif event_name == 'comment':
+            comment_lines = event['parameters']['comment'].splitlines()
+            event_description = '{}'.format(comment_lines[0].strip())
+            if len(comment_lines) > 1:
+                event_description += ' (...)'
+        elif event_name == 'label-add':
+            event_description = 'added labels {}'.format(', '.join(map(lambda l: colorise_repr(COLOR_LABEL, l), event['parameters']['labels'])))
+        else:
+            # if no special description formatting is provided, just display name of the event
+            event_description = ''
+        if event_description:
+            event_description = ': {}'.format(event_description)
+        print('{} {}{}'.format(colorise(COLOR_ISSUE_KEY, event['issue']), event_name, event_description))
 
 
 ################################################################################
