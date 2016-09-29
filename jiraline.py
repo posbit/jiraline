@@ -1207,6 +1207,7 @@ def commandShortlog(ui):
         final_size = len(squashed_shortlog)
         if final_size < initial_size:
             print('{}: shortened shortlog from {} to {} entries'.format(colorise(COLOR_NOTE, 'note'), initial_size, final_size))
+        write_shortlog(squashed_shortlog)
         if '--verbose' in ui:
             display_shortlog(squashed_shortlog)
     else:
