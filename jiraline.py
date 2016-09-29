@@ -1143,7 +1143,7 @@ def commandShortlog(ui):
         if initial_size < 2:
             print('{}: shortlog too short to shorten'.format(colorise(COLOR_WARNING, 'warning')))
             return
-        squashed_shortlog = squash_shortlog(shortlog, aggressive = ('--aggressive' in ui))
+        squashed_shortlog = squash_shortlog(shortlog, aggressive = ui.get('--aggressive'))
         final_size = len(squashed_shortlog)
         if final_size < initial_size:
             print('{}: shortened shortlog from {} to {} entries'.format(colorise(COLOR_NOTE, 'note'), initial_size, final_size))

@@ -454,6 +454,7 @@
                             {
                                 "short": "A",
                                 "long": "aggressive",
+                                "plural": true,
                                 "help": "be aggressive when compressing and squash similar events together (e.g. [slug, show] squashes to [slug])"
                             }
                         ]
