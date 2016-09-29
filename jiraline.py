@@ -1064,7 +1064,7 @@ def commandFetch(ui):
         if '--lazy' in ui and Cache(issue_name, lazy=True).is_cached():
             continue
         try:
-            if '--verbose' in ui:
+            if '--verbose' in ui or total_isues_to_fetch > 1:
                 percent_complete = round(((i+1)/total_isues_to_fetch*100), 2)
                 print('fetching {} ({}/{} ~{}%)'.format(colorise(COLOR_ISSUE_KEY, issue_name), i+1, total_isues_to_fetch, colorise_percentage(percent_complete, percent_complete)))
             fetch_issue(issue_name, fatal=False)
