@@ -1099,21 +1099,23 @@ def display_shortlog(shortlog):
 def _bug_event_without_assigned_weight(event):
     print('{}: {}: event {} does not have a weight assigned'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ERROR, 'bug'), colorise_repr(COLOR_LABEL, event['event'])))
 
-def squash_shortlog(shortlog, aggressive=False):
+SHORTLOG_EVENT_WEIGHTS = {
+    'slug': 0,
+    'transition': 0,
+    'label-add': 5,
+    'comment': 7,
+    'show': 10,
+}
+
+def squash_shortlog_aggressive_0(shortlog):
+    """Aggressive-squash-0 assumes that basic squashing has
+    already been performed.
+    """
     if len(shortlog) < 2:
         return shortlog
     squashed_shortlog = [shortlog[0]]
-    SHORTLOG_EVENT_WEIGHTS = {
-        'slug': 0,
-        'transition': 0,
-        'label-add': 5,
-        'comment': 7,
-        'show': 10,
-    }
     for event in shortlog[1:]:
-        if event['issue'] == squashed_shortlog[-1]['issue'] and event['event'] == squashed_shortlog[-1]['event']:
-            continue
-        if event['issue'] == squashed_shortlog[-1]['issue'] and aggressive:
+        if event['issue'] == squashed_shortlog[-1]['issue']:
             last_event_action = SHORTLOG_EVENT_WEIGHTS.get(squashed_shortlog[-1]['event'])
             this_event_action = SHORTLOG_EVENT_WEIGHTS.get(event['event'])
 
@@ -1132,6 +1134,18 @@ def squash_shortlog(shortlog, aggressive=False):
             else:
                 pass
         squashed_shortlog.append(event)
+    return squashed_shortlog
+
+def squash_shortlog(shortlog, aggressive=0):
+    if len(shortlog) < 2:
+        return shortlog
+    squashed_shortlog = [shortlog[0]]
+    for event in shortlog[1:]:
+        if event['issue'] == squashed_shortlog[-1]['issue'] and event['event'] == squashed_shortlog[-1]['event']:
+            continue
+        squashed_shortlog.append(event)
+    if aggressive and aggressive < 2:
+        squashed_shortlog = squash_shortlog_aggressive_0(squashed_shortlog)
     return squashed_shortlog
 
 def commandShortlog(ui):
