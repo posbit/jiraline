@@ -649,6 +649,13 @@ def read_shortlog():
             shortlog = json.loads(ifstream.read())
     return shortlog
 
+def write_shortlog(shortlog):
+    pth = get_shortlog_path()
+    if not os.path.isdir(pth):
+        os.makedirs(pth)
+    with open(os.path.join(pth, 'shortlog.json'), 'w') as ofstream:
+        ofstream.write(json.dumps(shortlog[-settings.get('shortlog_size', default=80):]))
+
 def append_shortlog_event(issue_name, log_content):
     issue_log_name = '{}.{}.json'.format(timestamp(), issue_name)
     pth = get_shortlog_path()
@@ -658,8 +665,7 @@ def append_shortlog_event(issue_name, log_content):
     log_content['issue'] = issue_name
     log_content['timestamp'] = timestamp()
     shortlog.append(log_content)
-    with open(os.path.join(pth, 'shortlog.json'), 'w') as ofstream:
-        ofstream.write(json.dumps(shortlog[-settings.get('shortlog_size', default=80):]))
+    write_shortlog(shortlog)
 
 def add_shortlog_event_transition(issue_name, to):
     append_shortlog_event(issue_name, log_content = {
