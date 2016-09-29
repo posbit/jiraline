@@ -659,7 +659,7 @@ def append_shortlog_event(issue_name, log_content):
     log_content['timestamp'] = timestamp()
     shortlog.append(log_content)
     with open(os.path.join(pth, 'shortlog.json'), 'w') as ofstream:
-        ofstream.write(json.dumps(shortlog[:-80]))
+        ofstream.write(json.dumps(shortlog[-settings.get('shortlog_size', default=80):]))
 
 def add_shortlog_event_transition(issue_name, to):
     append_shortlog_event(issue_name, log_content = {
