@@ -823,7 +823,7 @@ def commandIssue(ui):
                     exit(1)
             add_shortlog_event_label(issue_name, labels)
             for label in labels:
-                if '--verbose' in ui:
+                if '--verbose' in ui or len(labels) > 1:
                     print('applying label {}'.format(colorise_repr(COLOR_LABEL, label)))
                 add_label(issue_name, label)
         elif str(ui) == 'new':
