@@ -1096,13 +1096,41 @@ def display_shortlog(shortlog):
             event_description = ': {}'.format(event_description)
         print('{} {}{}'.format(colorise(COLOR_ISSUE_KEY, event['issue']), event_name, event_description))
 
+def _bug_event_without_assigned_weight(event):
+    print('{}: {}: event {} does not have a weight assigned'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ERROR, 'bug'), colorise_repr(COLOR_LABEL, event['event'])))
+
 def squash_shortlog(shortlog, aggressive=False):
     if len(shortlog) < 2:
         return shortlog
     squashed_shortlog = [shortlog[0]]
+    SHORTLOG_EVENT_WEIGHTS = {
+        'slug': 0,
+        'transition': 0,
+        'label-add': 5,
+        'comment': 7,
+        'show': 10,
+    }
     for event in shortlog[1:]:
         if event['issue'] == squashed_shortlog[-1]['issue'] and event['event'] == squashed_shortlog[-1]['event']:
             continue
+        if event['issue'] == squashed_shortlog[-1]['issue'] and aggressive:
+            last_event_action = SHORTLOG_EVENT_WEIGHTS.get(squashed_shortlog[-1]['event'])
+            this_event_action = SHORTLOG_EVENT_WEIGHTS.get(event['event'])
+
+            if last_event_action is None:
+                _bug_event_without_assigned_weight(squashed_shortlog[-1])
+            if this_event_action is None:
+                _bug_event_without_assigned_weight(event)
+            if last_event_action is None or this_event_action is None:
+                # zero out the comparison when an event does not have a weight assigned
+                last_event_action, this_event_action = 0, 0
+
+            if last_event_action > this_event_action:
+                squashed_shortlog.pop()
+            elif last_event_action < this_event_action:
+                continue
+            else:
+                pass
         squashed_shortlog.append(event)
     return squashed_shortlog
 
