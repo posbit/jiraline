@@ -1107,8 +1107,8 @@ SHORTLOG_EVENT_WEIGHTS = {
     'show': 10,
 }
 
-def squash_shortlog_aggressive_0(shortlog):
-    """Aggressive-squash-0 assumes that basic squashing has
+def squash_shortlog_aggressive_1(shortlog):
+    """Aggressive-squash-1 assumes that basic squashing has
     already been performed.
     """
     if len(shortlog) < 2:
@@ -1136,6 +1136,44 @@ def squash_shortlog_aggressive_0(shortlog):
         squashed_shortlog.append(event)
     return squashed_shortlog
 
+def rfind_if(seq, pred):
+    index = len(seq)-1
+    while index > -1:
+        if pred(seq[index]):
+            break
+        index -= 1
+    return index
+
+def squash_shortlog_aggressive_2(shortlog):
+    """Aggressive-squash-2 assumes that basic squashing has
+    already been performed.
+    """
+    if len(shortlog) < 2:
+        return shortlog
+    squashed_shortlog = [shortlog[0]]
+    for event in shortlog[1:]:
+        this_event_action = SHORTLOG_EVENT_WEIGHTS.get(event['event'])
+        index_of_last_event_for_the_same_issue = rfind_if(squashed_shortlog, lambda e: e['issue'] == event['issue'])
+        if index_of_last_event_for_the_same_issue > -1:
+            last_event_action = SHORTLOG_EVENT_WEIGHTS.get(squashed_shortlog[index_of_last_event_for_the_same_issue]['event'])
+
+            if last_event_action is None:
+                _bug_event_without_assigned_weight(squashed_shortlog[-1])
+            if this_event_action is None:
+                _bug_event_without_assigned_weight(event)
+            if last_event_action is None or this_event_action is None:
+                # zero out the comparison when an event does not have a weight assigned
+                last_event_action, this_event_action = 0, 0
+
+            if last_event_action > this_event_action:
+                squashed_shortlog.pop()
+            elif last_event_action < this_event_action:
+                continue
+            else:
+                pass
+        squashed_shortlog.append(event)
+    return squashed_shortlog
+
 def squash_shortlog(shortlog, aggressive=0):
     if len(shortlog) < 2:
         return shortlog
@@ -1144,8 +1182,10 @@ def squash_shortlog(shortlog, aggressive=0):
         if event['issue'] == squashed_shortlog[-1]['issue'] and event['event'] == squashed_shortlog[-1]['event']:
             continue
         squashed_shortlog.append(event)
-    if aggressive and aggressive < 2:
-        squashed_shortlog = squash_shortlog_aggressive_0(squashed_shortlog)
+    if aggressive and aggressive == 1:
+        squashed_shortlog = squash_shortlog_aggressive_1(squashed_shortlog)
+    if aggressive and aggressive > 1:
+        squashed_shortlog = squash_shortlog_aggressive_2(squashed_shortlog)
     return squashed_shortlog
 
 def commandShortlog(ui):
