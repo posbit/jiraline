@@ -1072,10 +1072,7 @@ def commandFetch(ui):
             print('{}: failed to fetch issue {}'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ISSUE_KEY, issue_name)))
 
 
-def commandShortlog(ui):
-    ui = ui.down()
-    shortlog = read_shortlog()
-    shortlog.reverse()
+def display_shortlog(shortlog):
     for event in shortlog:
         event_name = event['event']
         event_description = event['parameters']
@@ -1098,6 +1095,33 @@ def commandShortlog(ui):
         if event_description:
             event_description = ': {}'.format(event_description)
         print('{} {}{}'.format(colorise(COLOR_ISSUE_KEY, event['issue']), event_name, event_description))
+
+def squash_shortlog(shortlog, aggressive=False):
+    if len(shortlog) < 2:
+        return shortlog
+    squashed_shortlog = [shortlog[0]]
+    for event in shortlog[1:]:
+        if event['issue'] == squashed_shortlog[-1]['issue'] and event['event'] == squashed_shortlog[-1]['event']:
+            continue
+        squashed_shortlog.append(event)
+    return squashed_shortlog
+
+def commandShortlog(ui):
+    ui = ui.down()
+    shortlog = read_shortlog()
+    shortlog.reverse()
+    if str(ui) == 'squash':
+        initial_size = len(shortlog)
+        if initial_size < 2:
+            print('{}: shortlog too short to shorten'.format(colorise(COLOR_WARNING, 'warning')))
+            return
+        squashed_shortlog = squash_shortlog(shortlog, aggressive = ('--aggressive' in ui))
+        final_size = len(squashed_shortlog)
+        if final_size < initial_size:
+            print('{}: shortened shortlog from {} to {} entries'.format(colorise(COLOR_NOTE, 'note'), initial_size, final_size))
+        display_shortlog(squashed_shortlog)
+    else:
+        display_shortlog(shortlog)
 
 
 ################################################################################

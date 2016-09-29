@@ -444,6 +444,22 @@
             "doc": {
                 "help": "Display short, local log of events Jiraline recorded"
             },
+            "commands": {
+                "squash": {
+                    "doc": {
+                        "help": "Squash similar entries to compress the shortlog."
+                    },
+                    "options": {
+                        "local": [
+                            {
+                                "short": "A",
+                                "long": "aggressive",
+                                "help": "be aggressive when compressing and squash similar events together (e.g. [slug, show] squashes to [slug])"
+                            }
+                        ]
+                    }
+                }
+            },
             "operands": {
                 "no": [0, 0]
             }
