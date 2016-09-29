@@ -9,6 +9,12 @@ Changelog is updated as features and fixes are added to the code.
 
 - *incompat*, *enhancement*: move configuration file from `~/.jiraline` to `~/.config/jiraline/config.json`
 - *feature*: added label management commands (to avoid typos): `issue label (new|rm|ls)`
+- *enhancement*: disable colors when not writing to a terminal
+- *feature*: add `fetch` command for fetching issues (use cases: run Jiraline in background to fetch all issues
+  from a project; fetch several issues at once; fetch issue without showing it)
+- *enhancement*: better editor messages
+- *feature*: add `shortlog` command; it implements a local log of events, i.e. comments, shows, sluggifications,
+  transitions, and label adds
 
 
 ## From 0.1.1 to 0.1.2
