@@ -488,15 +488,15 @@ def displayBasicInformation(data):
     if labels:
         print('Labels:   {}'.format(', '.join(map(lambda s: colorise(COLOR_LABEL, s), labels))))
 
-    project = fields('project').get('name')
+    project = fields('project', {}).get('name')
     if project:
         print('Project:  {}'.format(colorise(COLOR_LABEL, project)))
 
-    issue_type = fields('issuetype').get('name')
+    issue_type = fields('issuetype', {}).get('name')
     if issue_type:
-        issue_status_name = fields('status').get('name', 'Unknown')
-        issue_status_category_name = fields('status').get('statusCategory', {}).get('name', 'Unknown')
-        issue_status_category_key = fields('status').get('statusCategory', {}).get('key', 'unknown')
+        issue_status_name = fields('status', {}).get('name', 'Unknown')
+        issue_status_category_name = fields('status', {}).get('statusCategory', {}).get('name', 'Unknown')
+        issue_status_category_key = fields('status', {}).get('statusCategory', {}).get('key', 'unknown')
         print('Issue:    {} in {} (category {}, key {})'.format(
             colorise(COLOR_LABEL, issue_type),
             colorise(COLOR_STATUS, issue_status_name),
