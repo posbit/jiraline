@@ -274,6 +274,8 @@ COLOR_NOTE = 'light_cyan'
 COLOR_ERROR = 'red'
 COLOR_WARNING = 'red_1'
 
+FORCE_COLOURS = False
+
 
 ################################################################################
 # Helper functions.
@@ -452,7 +454,7 @@ def set_customfield_executor(issue_name, message):
         exit(1)
 
 def colorise(color, string):
-    if colored and sys.stdout.isatty():
+    if colored and (sys.stdout.isatty() or FORCE_COLOURS):
         string = (colored.fg(color) + str(string) + colored.attr('reset'))
     return string
 
@@ -1212,6 +1214,9 @@ def squash_shortlog(shortlog, aggressive=0):
 
 def commandShortlog(ui):
     ui = ui.down()
+    if '--colorise' in ui:
+        global FORCE_COLOURS
+        FORCE_COLOURS = True
     shortlog = read_shortlog()
     shortlog.reverse()
     if str(ui) == 'squash':

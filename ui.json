@@ -444,6 +444,15 @@
             "doc": {
                 "help": "Display short, local log of events Jiraline recorded"
             },
+            "options": {
+                "local": [
+                    {
+                        "short": "c",
+                        "long": "colorise",
+                        "help": "force colorisation"
+                    }
+                ]
+            },
             "commands": {
                 "squash": {
                     "doc": {
