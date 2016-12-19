@@ -473,6 +473,62 @@
             "operands": {
                 "no": [0, 0]
             }
+        },
+        "open": {
+            "doc": {
+                "help": "Open issues"
+            },
+            "options": {
+                "local": [
+                    {
+                        "short": "p",
+                        "long": "project",
+                        "arguments": ["project:str"],
+                        "help": "select project to which the issue is to be assigned"
+                    },
+                    {
+                        "short": "d",
+                        "long": "description",
+                        "arguments": ["description:str"],
+                        "help": "set description for the issue"
+                    },
+                    {
+                        "short": "s",
+                        "long": "summary",
+                        "arguments": ["summary:str"],
+                        "help": "set summary for the issue"
+                    },
+                    {
+                        "short": "i",
+                        "long": "issue-type",
+                        "arguments": ["issue type:str"],
+                        "help": "set issue type"
+                    },
+                    {
+                        "short": "l",
+                        "long": "label",
+                        "arguments": ["label:str"],
+                        "plural": true,
+                        "help": "add label to the issue (this option can be passed many times)"
+                    }
+                ]
+            },
+            "commands": {
+                "what": {
+                    "doc": {
+                        "help": "Display createmeta"
+                    },
+                    "options": {
+                        "local": [
+                            {
+                                "short": "p",
+                                "long": "pretty",
+                                "help": "print pretty JSON"
+                            }
+                        ]
+                    }
+                }
+            }
         }
     },
     "operands": {

@@ -1235,6 +1235,68 @@ def commandShortlog(ui):
         display_shortlog(shortlog)
 
 
+def commandOpen(ui):
+    ui = ui.down()
+    if str(ui) == 'open':
+        summary = ''
+        if '-s' in ui:
+            summary = ui.get('-s')
+        if not summary.strip():
+            summary = get_message_from_editor('issue_open_message', {'what': 'summary'})
+        if not summary.strip():
+            print('error: aborting due to empty summary')
+            exit(1)
+
+        description = ''
+        if '-d' in ui:
+            description = ui.get('-d')
+        if not description.strip():
+            description = get_message_from_editor('issue_open_message', {'what': 'description'})
+        if not description.strip():
+            print('error: aborting due to empty description')
+            exit(1)
+
+        project = None
+        if '-p' in ui:
+            project = ui.get('-p').strip()
+        if not project:
+            print('error: aborting: no project selected')
+            exit(1)
+
+        issuetype = None
+        if '-i' in ui:
+            issuetype = ui.get('-i')
+        if not issuetype:
+            print('error: aborting: no issue type selected')
+            exit(1)
+
+        fields = {
+            'project': {
+                'id': project,
+            },
+            'summary': summary,
+            'description': description,
+            'issuetype': {
+                'id': issuetype,
+            },
+            'labels': list(map(lambda each: each[0], ui.get('-l'))),
+        }
+        r = requests.post('https://{}.atlassian.net/rest/api/2/issue'.format(settings.get('domain')),
+            json={'fields': fields,},
+            auth=settings.credentials()
+        )
+        print(r.text)
+        if r.status_code == 400:
+            exit(1)
+    elif str(ui) == 'what':
+        r = requests.get('https://{}.atlassian.net/rest/api/2/issue/createmeta'.format(settings.get('domain')), auth=settings.credentials())
+        text = r.text
+        if '--pretty' in ui:
+            print(json.dumps(json.loads(text), indent=2))
+        else:
+            print(text)
+
+
 ################################################################################
 # Program's entry point.
 #
@@ -1272,4 +1334,5 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandPin,
     commandFetch,
     commandShortlog,
+    commandOpen,
 )
