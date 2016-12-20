@@ -633,7 +633,7 @@ def expand_issue_name(issue_name, project=None):
         issue_name = '{}-{}'.format((project if project is not None else settings.get('default_project')), issue_name)
     return issue_name
 
-def get_message_from_editor(template='', fmt={}):
+def get_message_from_editor(template='', fmt={}, join_lines=''):
     editor = os.getenv('EDITOR', 'vi')
     message_path = os.path.expanduser(os.path.join('~', '.local', 'share', 'jiraline', 'tmp_message'))
     if template and format:
@@ -647,7 +647,9 @@ def get_message_from_editor(template='', fmt={}):
     message = ''
     with open(message_path) as ifstream:
         message_lines = ifstream.readlines()
-        message = ''.join([l for l in message_lines if not l.lstrip().startswith('#')]).strip()
+        message = [l for l in message_lines if not l.lstrip().startswith('#')]
+        if join_lines is not None:
+            message = join_lines.join(message).strip()
     return message
 
 def get_shortlog_path():
