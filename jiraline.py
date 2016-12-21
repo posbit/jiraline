@@ -1124,6 +1124,8 @@ def display_shortlog(shortlog):
                 event_description += ' (...)'
         elif event_name == 'label-add':
             event_description = 'added labels {}'.format(', '.join(map(lambda l: colorise_repr(COLOR_LABEL, l), event['parameters']['labels'])))
+        elif event_name == 'open-issue':
+            event_description = 'opened issue: {}'.format(colorise(COLOR_NOTE, event_description.get('summary')))
         else:
             # if no special description formatting is provided, just display name of the event
             event_description = ''
