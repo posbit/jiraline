@@ -731,6 +731,15 @@ def add_shortlog_event_comment(issue_name, comment):
         },
     })
 
+def add_shortlog_event_open_issue(issue_name, issue_summary):
+    append_shortlog_event(issue_name, log_content = {
+        'event': 'open-issue',
+        'parameters': {
+            'summary': issue_summary,
+            'key': issue_name,
+        },
+    })
+
 
 
 ################################################################################
@@ -1292,6 +1301,9 @@ def commandOpen(ui):
         print(r.text)
         if r.status_code == 400:
             exit(1)
+        else:
+            data = json.loads(r.text)
+            add_shortlog_event_open_issue(data.get('key'), summary)
     elif str(ui) == 'what':
         r = requests.get('https://{}.atlassian.net/rest/api/2/issue/createmeta'.format(settings.get('domain')), auth=settings.credentials())
         text = r.text
