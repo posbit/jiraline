@@ -1295,6 +1295,9 @@ def commandOpen(ui):
                 'id': issuetype,
             },
             'labels': list(map(lambda each: each[0], ui.get('-l'))),
+            'assignee': {
+                'name': settings.username(),
+            },
         }
         r = requests.post('https://{}.atlassian.net/rest/api/2/issue'.format(settings.get('domain')),
             json={'fields': fields,},
