@@ -1331,11 +1331,14 @@ def commandOpen(ui):
             json={'fields': fields,},
             auth=settings.credentials()
         )
-        print(r.text)
         if r.status_code == 400:
             exit(1)
         else:
             data = json.loads(r.text)
+            try:
+                print(data.get('key', r.text))
+            except Exception as e:
+                print(r.text)
             add_shortlog_event_open_issue(data.get('key'), summary)
     elif str(ui) == 'what':
         r = requests.get('https://{}.atlassian.net/rest/api/2/issue/createmeta'.format(settings.get('domain')), auth=settings.credentials())
