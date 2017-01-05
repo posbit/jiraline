@@ -484,7 +484,7 @@
                         "short": "p",
                         "long": "project",
                         "arguments": ["project:str"],
-                        "help": "select project to which the issue is to be assigned"
+                        "help": "select project to which the issue is to be assigned (ID or name)"
                     },
                     {
                         "short": "d",
@@ -502,7 +502,7 @@
                         "short": "i",
                         "long": "issue-type",
                         "arguments": ["issue type:str"],
-                        "help": "set issue type"
+                        "help": "set issue type (ID or name)"
                     },
                     {
                         "short": "l",
