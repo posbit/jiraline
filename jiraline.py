@@ -1251,6 +1251,48 @@ def commandShortlog(ui):
 def commandOpen(ui):
     ui = ui.down()
     if str(ui) == 'open':
+        project, project_original = None, None
+        if '-p' in ui:
+            project = ui.get('-p').strip()
+            project_original = project
+        if not project:
+            print('error: aborting: no project selected')
+            exit(1)
+
+        issuetype = None
+        if '-i' in ui:
+            issuetype = ui.get('-i')
+        if not issuetype:
+            print('error: aborting: no issue type selected')
+            exit(1)
+
+        create_issue_meta = {}
+        if (not issuetype.isdigit()) or (not project.isdigit()):
+            create_issue_meta_path = os.path.expanduser(os.path.join('~', '.config', 'jiraline', 'createissuemeta.json'))
+            if not os.path.isfile(create_issue_meta_path):
+                print('{}: no issue create metadata available'.format(colorise(COLOR_ERROR, 'error')))
+                print('{}: use "{}" to store it'.format(colorise(COLOR_NOTE, 'note'), create_issue_meta_path))
+                exit(1)
+            with open(create_issue_meta_path, 'r') as ifstream:
+                create_issue_meta = json.loads(ifstream.read())
+
+        if not project.isdigit():
+            available_projects = create_issue_meta.get('projects', [])
+            matching = list(filter(lambda each: each.get('key') == project, available_projects))
+            if not matching:
+                print('{}: not a valid project: {}'.format(colorise(COLOR_ERROR, 'error'), colorise(COLOR_LABEL, project)))
+                exit(1)
+            project = matching[0].get('id')
+
+        if not issuetype.isdigit():
+            project_meta = list(filter(lambda each: each.get('id') == project, create_issue_meta.get('projects', [])))[0]
+            available_issue_types = project_meta.get('issuetypes', [])
+            matching = list(filter(lambda each: each.get('name') == issuetype, available_issue_types))
+            if not matching:
+                print('{}: not a valid issue type for project {}: {}'.format(colorise(COLOR_ERROR, 'error'), colorise(COLOR_LABEL, project_original), colorise(COLOR_LABEL, issuetype)))
+                exit(1)
+            issuetype = matching[0].get('id')
+
         summary = ''
         if '-s' in ui:
             summary = ui.get('-s')
@@ -1269,20 +1311,6 @@ def commandOpen(ui):
             }, join_lines='\n')
         if not description.strip():
             print('error: aborting due to empty description')
-            exit(1)
-
-        project = None
-        if '-p' in ui:
-            project = ui.get('-p').strip()
-        if not project:
-            print('error: aborting: no project selected')
-            exit(1)
-
-        issuetype = None
-        if '-i' in ui:
-            issuetype = ui.get('-i')
-        if not issuetype:
-            print('error: aborting: no issue type selected')
             exit(1)
 
         fields = {
