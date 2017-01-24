@@ -794,7 +794,7 @@ def commandComment(ui):
 
 
 def commandAssign(ui):
-    issue_name = ui.operands()[0]
+    issue_name = expand_issue_name(ui.operands()[0])
     store_last_active_issue_marker(issue_name)
     user_name = ui.get('-u')
     assign = {'name': user_name}
