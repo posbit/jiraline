@@ -796,15 +796,33 @@ def commandComment(ui):
 def commandAssign(ui):
     issue_name = expand_issue_name(ui.operands()[0])
     store_last_active_issue_marker(issue_name)
-    user_name = ui.get('-u')
-    assign = {'name': user_name}
-    r = connection.put('/rest/api/2/issue/{}/assignee'.format(issue_name), json=assign)
-    if r.status_code == 400:
-        print('There is a problem with the received user representation.')
-    elif r.status_code == 401:
-        print("Calling user does not have permission to assign the issue.")
-    elif r.status_code == 404:
-        print("Either the issue or the user does not exist.")
+    if '--ls' in ui:
+        url = '/rest/api/2/user/assignable/search?issueKey={}'.format(issue_name)
+        if '--user' in ui:
+            url += '&username={}'.format(ui.get('--user'))
+        r = connection.get(url)
+        if r.status_code == 200:
+            list_of_users = r.json()
+            longest_username = max(map(len, map(lambda each: each.get('key'), list_of_users)))
+            for u in list_of_users:
+                fmt = '{}: {}'
+                args = (colorise(COLOR_LABEL, u.get('key')).ljust(longest_username), u.get('displayName'),)
+                if '--verbose' in ui:
+                    fmt += ' ({}), email: {}'
+                    args += (u.get('name'), u.get('emailAddress'),)
+                print(fmt.format(*args))
+        else:
+            print('{}: Request failed'.format(colorise(COLOR_ERROR, 'error')))
+    else:
+        user_name = ui.get('-u')
+        assign = {'name': user_name}
+        r = connection.put('/rest/api/2/issue/{}/assignee'.format(issue_name), json=assign)
+        if r.status_code == 400:
+            print('There is a problem with the received user representation.')
+        elif r.status_code == 401:
+            print("Calling user does not have permission to assign the issue.")
+        elif r.status_code == 404:
+            print("Either the issue or the user does not exist.")
 
 
 def commandIssue(ui):

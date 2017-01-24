@@ -141,7 +141,13 @@
                         "short": "u",
                         "help": "user name",
                         "arguments" : ["user_name:str"],
-                        "required": true
+                        "required": true,
+                        "not_with": ["--ls"]
+                    },
+                    {
+                        "long": "ls",
+                        "short": "l",
+                        "help": "list assignable users"
                     }
                 ]
             },
