@@ -516,6 +516,12 @@
                         "arguments": ["label:str"],
                         "plural": true,
                         "help": "add label to the issue (this option can be passed many times)"
+                    },
+                    {
+                        "short": "a",
+                        "long": "assignee",
+                        "arguments": ["name:str"],
+                        "help": "add assignee to issue"
                     }
                 ]
             },

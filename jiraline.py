@@ -1336,6 +1336,10 @@ def commandOpen(ui):
             print('error: aborting due to empty description')
             exit(1)
 
+        assignee_name = settings.username()
+        if '--assignee' in ui:
+            assignee_name = ui.get('-a')
+
         fields = {
             'project': {
                 'id': project,
@@ -1347,7 +1351,7 @@ def commandOpen(ui):
             },
             'labels': list(map(lambda each: each[0], ui.get('-l'))),
             'assignee': {
-                'name': settings.username(),
+                'name': assignee_name,
             },
         }
         r = requests.post('https://{}.atlassian.net/rest/api/2/issue'.format(settings.get('domain')),
