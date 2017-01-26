@@ -803,7 +803,12 @@ def commandAssign(ui):
         r = connection.get(url)
         if r.status_code == 200:
             list_of_users = r.json()
-            longest_username = max(map(len, map(lambda each: each.get('key'), list_of_users)))
+            longest_username = 0
+            try:
+                longest_username = max(map(len, map(lambda each: each.get('key'), list_of_users)))
+            except ValueError:
+                # raised when there are no users matching
+                pass
             for u in list_of_users:
                 fmt = '{}: {}'
                 args = (colorise(COLOR_LABEL, u.get('key')).ljust(longest_username), u.get('displayName'),)
