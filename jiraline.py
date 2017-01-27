@@ -1130,7 +1130,11 @@ def commandFetch(ui):
             print('{}: failed to fetch issue {}'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ISSUE_KEY, issue_name)))
 
 
-def display_shortlog(shortlog):
+def display_shortlog(shortlog, head=None, tail=None):
+    if head is not None:
+        shortlog = shortlog[:head]
+    if tail is not None:
+        shortlog = shortlog[tail:]
     for event in shortlog:
         event_name = event['event']
         event_description = event['parameters']
@@ -1268,7 +1272,13 @@ def commandShortlog(ui):
         if '--verbose' in ui:
             display_shortlog(squashed_shortlog)
     else:
-        display_shortlog(shortlog)
+        head = None
+        tail = None
+        if '--head' in ui:
+            head = ui.get('-H')
+        if '--tail' in ui:
+            tail = ui.get('-T')
+        display_shortlog(shortlog, head=head, tail=tail)
 
 
 def commandOpen(ui):

@@ -456,6 +456,18 @@
                         "short": "c",
                         "long": "colorise",
                         "help": "force colorisation"
+                    },
+                    {
+                        "short": "H",
+                        "long": "head",
+                        "arguments": ["count:int"],
+                        "help": "display N head entries"
+                    },
+                    {
+                        "short": "T",
+                        "long": "tail",
+                        "arguments": ["count:int"],
+                        "help": "display N tail entries"
                     }
                 ]
             },
