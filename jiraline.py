@@ -482,6 +482,10 @@ def displayBasicInformation(data):
     if reporter:
         print('Reporter: {}'.format(stringify_reporter(reporter)))
 
+    assignee = fields('assignee')
+    if assignee:
+        print('Assignee: {}'.format(stringify_reporter(assignee)))
+
     created = fields('created')
     if created:
         print('Created:  {}'.format(created.replace('T', ' ').replace('+', ' +')))
