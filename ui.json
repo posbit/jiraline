@@ -141,7 +141,13 @@
                         "short": "u",
                         "help": "user name",
                         "arguments" : ["user_name:str"],
-                        "required": true
+                        "required": true,
+                        "not_with": ["--ls"]
+                    },
+                    {
+                        "long": "ls",
+                        "short": "l",
+                        "help": "list assignable users"
                     }
                 ]
             },
@@ -444,6 +450,27 @@
             "doc": {
                 "help": "Display short, local log of events Jiraline recorded"
             },
+            "options": {
+                "local": [
+                    {
+                        "short": "c",
+                        "long": "colorise",
+                        "help": "force colorisation"
+                    },
+                    {
+                        "short": "H",
+                        "long": "head",
+                        "arguments": ["count:int"],
+                        "help": "display N head entries"
+                    },
+                    {
+                        "short": "T",
+                        "long": "tail",
+                        "arguments": ["count:int"],
+                        "help": "display N tail entries"
+                    }
+                ]
+            },
             "commands": {
                 "squash": {
                     "doc": {
@@ -463,6 +490,68 @@
             },
             "operands": {
                 "no": [0, 0]
+            }
+        },
+        "open": {
+            "doc": {
+                "help": "Open issues"
+            },
+            "options": {
+                "local": [
+                    {
+                        "short": "p",
+                        "long": "project",
+                        "arguments": ["project:str"],
+                        "help": "select project to which the issue is to be assigned (ID or name)"
+                    },
+                    {
+                        "short": "d",
+                        "long": "description",
+                        "arguments": ["description:str"],
+                        "help": "set description for the issue"
+                    },
+                    {
+                        "short": "s",
+                        "long": "summary",
+                        "arguments": ["summary:str"],
+                        "help": "set summary for the issue"
+                    },
+                    {
+                        "short": "i",
+                        "long": "issue-type",
+                        "arguments": ["issue type:str"],
+                        "help": "set issue type (ID or name)"
+                    },
+                    {
+                        "short": "l",
+                        "long": "label",
+                        "arguments": ["label:str"],
+                        "plural": true,
+                        "help": "add label to the issue (this option can be passed many times)"
+                    },
+                    {
+                        "short": "a",
+                        "long": "assignee",
+                        "arguments": ["name:str"],
+                        "help": "add assignee to issue"
+                    }
+                ]
+            },
+            "commands": {
+                "what": {
+                    "doc": {
+                        "help": "Display createmeta"
+                    },
+                    "options": {
+                        "local": [
+                            {
+                                "short": "p",
+                                "long": "pretty",
+                                "help": "print pretty JSON"
+                            }
+                        ]
+                    }
+                }
             }
         }
     },

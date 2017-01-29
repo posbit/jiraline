@@ -274,6 +274,8 @@ COLOR_NOTE = 'light_cyan'
 COLOR_ERROR = 'red'
 COLOR_WARNING = 'red_1'
 
+FORCE_COLOURS = False
+
 
 ################################################################################
 # Helper functions.
@@ -452,7 +454,7 @@ def set_customfield_executor(issue_name, message):
         exit(1)
 
 def colorise(color, string):
-    if colored and sys.stdout.isatty():
+    if colored and (sys.stdout.isatty() or FORCE_COLOURS):
         string = (colored.fg(color) + str(string) + colored.attr('reset'))
     return string
 
@@ -479,6 +481,10 @@ def displayBasicInformation(data):
     reporter = fields('reporter')
     if reporter:
         print('Reporter: {}'.format(stringify_reporter(reporter)))
+
+    assignee = fields('assignee')
+    if assignee:
+        print('Assignee: {}'.format(stringify_reporter(assignee)))
 
     created = fields('created')
     if created:
@@ -631,7 +637,7 @@ def expand_issue_name(issue_name, project=None):
         issue_name = '{}-{}'.format((project if project is not None else settings.get('default_project')), issue_name)
     return issue_name
 
-def get_message_from_editor(template='', fmt={}):
+def get_message_from_editor(template='', fmt={}, join_lines=''):
     editor = os.getenv('EDITOR', 'vi')
     message_path = os.path.expanduser(os.path.join('~', '.local', 'share', 'jiraline', 'tmp_message'))
     if template and format:
@@ -645,7 +651,9 @@ def get_message_from_editor(template='', fmt={}):
     message = ''
     with open(message_path) as ifstream:
         message_lines = ifstream.readlines()
-        message = ''.join([l for l in message_lines if not l.lstrip().startswith('#')]).strip()
+        message = [l for l in message_lines if not l.lstrip().startswith('#')]
+        if join_lines is not None:
+            message = join_lines.join(message).strip()
     return message
 
 def get_shortlog_path():
@@ -727,6 +735,15 @@ def add_shortlog_event_comment(issue_name, comment):
         },
     })
 
+def add_shortlog_event_open_issue(issue_name, issue_summary):
+    append_shortlog_event(issue_name, log_content = {
+        'event': 'open-issue',
+        'parameters': {
+            'summary': issue_summary,
+            'key': issue_name,
+        },
+    })
+
 
 
 ################################################################################
@@ -781,17 +798,40 @@ def commandComment(ui):
 
 
 def commandAssign(ui):
-    issue_name = ui.operands()[0]
+    issue_name = expand_issue_name(ui.operands()[0])
     store_last_active_issue_marker(issue_name)
-    user_name = ui.get('-u')
-    assign = {'name': user_name}
-    r = connection.put('/rest/api/2/issue/{}/assignee'.format(issue_name), json=assign)
-    if r.status_code == 400:
-        print('There is a problem with the received user representation.')
-    elif r.status_code == 401:
-        print("Calling user does not have permission to assign the issue.")
-    elif r.status_code == 404:
-        print("Either the issue or the user does not exist.")
+    if '--ls' in ui:
+        url = '/rest/api/2/user/assignable/search?issueKey={}'.format(issue_name)
+        if '--user' in ui:
+            url += '&username={}'.format(ui.get('--user'))
+        r = connection.get(url)
+        if r.status_code == 200:
+            list_of_users = r.json()
+            longest_username = 0
+            try:
+                longest_username = max(map(len, map(lambda each: each.get('key'), list_of_users)))
+            except ValueError:
+                # raised when there are no users matching
+                pass
+            for u in list_of_users:
+                fmt = '{}: {}'
+                args = (colorise(COLOR_LABEL, u.get('key')).ljust(longest_username), u.get('displayName'),)
+                if '--verbose' in ui:
+                    fmt += ' ({}), email: {}'
+                    args += (u.get('name'), u.get('emailAddress'),)
+                print(fmt.format(*args))
+        else:
+            print('{}: Request failed'.format(colorise(COLOR_ERROR, 'error')))
+    else:
+        user_name = ui.get('-u')
+        assign = {'name': user_name}
+        r = connection.put('/rest/api/2/issue/{}/assignee'.format(issue_name), json=assign)
+        if r.status_code == 400:
+            print('There is a problem with the received user representation.')
+        elif r.status_code == 401:
+            print("Calling user does not have permission to assign the issue.")
+        elif r.status_code == 404:
+            print("Either the issue or the user does not exist.")
 
 
 def commandIssue(ui):
@@ -1094,7 +1134,11 @@ def commandFetch(ui):
             print('{}: failed to fetch issue {}'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ISSUE_KEY, issue_name)))
 
 
-def display_shortlog(shortlog):
+def display_shortlog(shortlog, head=None, tail=None):
+    if head is not None:
+        shortlog = shortlog[:head]
+    if tail is not None:
+        shortlog = shortlog[tail:]
     for event in shortlog:
         event_name = event['event']
         event_description = event['parameters']
@@ -1111,6 +1155,8 @@ def display_shortlog(shortlog):
                 event_description += ' (...)'
         elif event_name == 'label-add':
             event_description = 'added labels {}'.format(', '.join(map(lambda l: colorise_repr(COLOR_LABEL, l), event['parameters']['labels'])))
+        elif event_name == 'open-issue':
+            event_description = 'opened issue: {}'.format(colorise(COLOR_NOTE, event_description.get('summary')))
         else:
             # if no special description formatting is provided, just display name of the event
             event_description = ''
@@ -1212,6 +1258,9 @@ def squash_shortlog(shortlog, aggressive=0):
 
 def commandShortlog(ui):
     ui = ui.down()
+    if '--colorise' in ui:
+        global FORCE_COLOURS
+        FORCE_COLOURS = True
     shortlog = read_shortlog()
     shortlog.reverse()
     if str(ui) == 'squash':
@@ -1227,7 +1276,118 @@ def commandShortlog(ui):
         if '--verbose' in ui:
             display_shortlog(squashed_shortlog)
     else:
-        display_shortlog(shortlog)
+        head = None
+        tail = None
+        if '--head' in ui:
+            head = ui.get('-H')
+        if '--tail' in ui:
+            tail = ui.get('-T')
+        display_shortlog(shortlog, head=head, tail=tail)
+
+
+def commandOpen(ui):
+    ui = ui.down()
+    if str(ui) == 'open':
+        project, project_original = None, None
+        if '-p' in ui:
+            project = ui.get('-p').strip()
+            project_original = project
+        if not project:
+            print('error: aborting: no project selected')
+            exit(1)
+
+        issuetype = None
+        if '-i' in ui:
+            issuetype = ui.get('-i')
+        if not issuetype:
+            print('error: aborting: no issue type selected')
+            exit(1)
+
+        create_issue_meta = {}
+        if (not issuetype.isdigit()) or (not project.isdigit()):
+            create_issue_meta_path = os.path.expanduser(os.path.join('~', '.config', 'jiraline', 'createissuemeta.json'))
+            if not os.path.isfile(create_issue_meta_path):
+                print('{}: no issue create metadata available'.format(colorise(COLOR_ERROR, 'error')))
+                print('{}: use "{}" to store it'.format(colorise(COLOR_NOTE, 'note'), create_issue_meta_path))
+                exit(1)
+            with open(create_issue_meta_path, 'r') as ifstream:
+                create_issue_meta = json.loads(ifstream.read())
+
+        if not project.isdigit():
+            available_projects = create_issue_meta.get('projects', [])
+            matching = list(filter(lambda each: each.get('key') == project, available_projects))
+            if not matching:
+                print('{}: not a valid project: {}'.format(colorise(COLOR_ERROR, 'error'), colorise(COLOR_LABEL, project)))
+                exit(1)
+            project = matching[0].get('id')
+
+        if not issuetype.isdigit():
+            project_meta = list(filter(lambda each: each.get('id') == project, create_issue_meta.get('projects', [])))[0]
+            available_issue_types = project_meta.get('issuetypes', [])
+            matching = list(filter(lambda each: each.get('name') == issuetype, available_issue_types))
+            if not matching:
+                print('{}: not a valid issue type for project {}: {}'.format(colorise(COLOR_ERROR, 'error'), colorise(COLOR_LABEL, project_original), colorise(COLOR_LABEL, issuetype)))
+                exit(1)
+            issuetype = matching[0].get('id')
+
+        summary = ''
+        if '-s' in ui:
+            summary = ui.get('-s')
+        if not summary.strip():
+            summary = get_message_from_editor('issue_open_message', {'what': 'summary'})
+        if not summary.strip():
+            print('error: aborting due to empty summary')
+            exit(1)
+
+        description = ''
+        if '-d' in ui:
+            description = ui.get('-d')
+        if not description.strip():
+            description = get_message_from_editor('issue_open_message_description', {
+                'summary': get_nice_wall_of_text(summary, indent='#   '),
+            }, join_lines='\n')
+        if not description.strip():
+            print('error: aborting due to empty description')
+            exit(1)
+
+        assignee_name = settings.username()
+        if '--assignee' in ui:
+            assignee_name = ui.get('-a')
+
+        fields = {
+            'project': {
+                'id': project,
+            },
+            'summary': summary,
+            'description': description,
+            'issuetype': {
+                'id': issuetype,
+            },
+            'labels': list(map(lambda each: each[0], ui.get('-l'))),
+            'assignee': {
+                'name': assignee_name,
+            },
+        }
+        r = requests.post('https://{}.atlassian.net/rest/api/2/issue'.format(settings.get('domain')),
+            json={'fields': fields,},
+            auth=settings.credentials()
+        )
+        if r.status_code == 400:
+            exit(1)
+        else:
+            data = json.loads(r.text)
+            try:
+                print(data.get('key', r.text))
+            except Exception as e:
+                print(r.text)
+            add_shortlog_event_open_issue(data.get('key'), summary)
+    elif str(ui) == 'what':
+        r = requests.get('https://{}.atlassian.net/rest/api/2/issue/createmeta'.format(settings.get('domain')), auth=settings.credentials())
+        text = r.text
+        if '--pretty' in ui:
+            print(json.dumps(json.loads(text), indent=2))
+        else:
+            print(text)
 
 
 ################################################################################
@@ -1267,4 +1427,5 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandPin,
     commandFetch,
     commandShortlog,
+    commandOpen,
 )
