@@ -1342,11 +1342,11 @@ def commandOpen(ui):
         description = ''
         if '-d' in ui:
             description = ui.get('-d')
-        if not description.strip():
+        if (not description.strip()) and '--allow-empty-message' not in ui:
             description = get_message_from_editor('issue_open_message_description', {
                 'summary': get_nice_wall_of_text(summary, indent='#   '),
             }, join_lines='\n')
-        if not description.strip():
+        if (not description.strip()) and '--allow-empty-message' not in ui:
             print('error: aborting due to empty description')
             exit(1)
 

@@ -534,6 +534,11 @@
                         "long": "assignee",
                         "arguments": ["name:str"],
                         "help": "add assignee to issue"
+                    },
+                    {
+                        "short": "A",
+                        "long": "allow-empty-message",
+                        "help": "allow empty issue message"
                     }
                 ]
             },
