@@ -157,6 +157,9 @@ class Settings:
     def __getitem__(self, key):
         return self._settings[key]
 
+    def __contains__(self, key):
+        return (key in self._settings)
+
     @staticmethod
     def get_settings_path():
         return os.path.expanduser(os.path.join('~', '.config', 'jiraline', 'config.json'))
@@ -178,6 +181,15 @@ class Settings:
         return self
 
     # Low-level access API.
+    def data(self):
+        return self._settings
+
+    def keys(self):
+        return self._settings.keys()
+
+    def items(self):
+        return self._settings.items()
+
     def get(self, *path, default=None):
         value = self._settings
         for key in path:
