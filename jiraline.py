@@ -777,7 +777,7 @@ def commandComment(ui):
         }
         if cached.is_cached():
             fmt['issue_summary'] = get_nice_wall_of_text(cached.get('fields.summary', default=summary_not_available).strip(), indent='#   ')
-            fmt['issue_description'] = get_nice_wall_of_text(cached.get('fields.description', default=description_not_available).strip(), indent='#   ')
+            fmt['issue_description'] = get_nice_wall_of_text((cached.get('fields.description', default=description_not_available) or description_not_available).strip(), indent='#   ')
         if '--reply' in ui and cached.is_cached():
             comments = cached.get('fields', 'comment', default={}).get('comments', [])
             if comments:
