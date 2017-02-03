@@ -1308,7 +1308,7 @@ def commandOpen(ui):
             print('error: aborting: no project selected')
             exit(1)
 
-        issuetype = None
+        issuetype = str(settings.data().get('default_issue_type'))
         if '-i' in ui:
             issuetype = ui.get('-i')
         if not issuetype:
