@@ -369,6 +369,12 @@
                         "help": "create new Git branch using the slug as branch name"
                     },
                     {
+                        "short": "A",
+                        "long": "allow-branch-from",
+                        "arguments": ["branch name:str"],
+                        "help": "override base branch name set in config"
+                    },
+                    {
                         "short": "C",
                         "long": "git-checkout",
                         "help": "checkout Git branch with the same name as generated slug"

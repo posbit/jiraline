@@ -1005,6 +1005,17 @@ def commandSearch(ui):
         print('error: HTTP {}'.format(r.status_code))
 
 
+def get_current_git_branch():
+    p = subprocess.Popen(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), stdout=subprocess.PIPE)
+    output, error = p.communicate()
+    output = output.decode('utf-8').strip()
+    git_exit_code = p.wait()
+    if git_exit_code != 0:
+        print('error: Git error')
+        exit(git_exit_code)
+    branch_name = output.strip()
+    return branch_name
+
 def commandSlug(ui):
     ui = ui.down()
     issue_name = expand_issue_name(ui.operands()[0])
@@ -1045,6 +1056,16 @@ def commandSlug(ui):
     add_shortlog_event_slug(issue_name, issue_slug)
 
     if '--git-branch' in ui:
+        allow_branching_from = settings.data().get('base_branch')
+        if '--allow-branch-from' in ui:
+            allow_branching_from = ui.get('--allow-branch-from')
+        current_git_branch = get_current_git_branch()
+        if allow_branching_from != current_git_branch:
+            print('{}: branching from {} is not allowed'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, current_git_branch)))
+            if allow_branching_from is not None:
+                print('{}: only branching from {} is allowed'.format(colorise(COLOR_NOTE, 'note'), colorise_repr(COLOR_LABEL, allow_branching_from)))
+            exit(1)
+        exit(42)
         r = os.system('git branch {0}'.format(issue_slug))
         r = (r >> 8)
         if r != 0:
