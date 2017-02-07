@@ -1065,7 +1065,6 @@ def commandSlug(ui):
             if allow_branching_from is not None:
                 print('{}: only branching from {} is allowed'.format(colorise(COLOR_NOTE, 'note'), colorise_repr(COLOR_LABEL, allow_branching_from)))
             exit(1)
-        exit(42)
         r = os.system('git branch {0}'.format(issue_slug))
         r = (r >> 8)
         if r != 0:
