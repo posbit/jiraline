@@ -1060,7 +1060,7 @@ def commandSlug(ui):
         if '--allow-branch-from' in ui:
             allow_branching_from = ui.get('--allow-branch-from')
         current_git_branch = get_current_git_branch()
-        if allow_branching_from != current_git_branch:
+        if allow_branching_from != 'HEAD' and allow_branching_from != current_git_branch:
             print('{}: branching from {} is not allowed'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, current_git_branch)))
             if allow_branching_from is not None:
                 print('{}: only branching from {} is allowed'.format(colorise(COLOR_NOTE, 'note'), colorise_repr(COLOR_LABEL, allow_branching_from)))
