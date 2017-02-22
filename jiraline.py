@@ -190,18 +190,8 @@ class Settings:
     def items(self):
         return self._settings.items()
 
-    def get(self, *path, default=None):
-        value = self._settings
-        for key in path:
-            if key not in value and default is None:
-                print('error: key missing from configuration: {}'.format('.'.join(path)))
-                exit(1)
-            if key not in value and default is not None:
-                return default
-            value = value[key]
-            if type(value) is not dict:
-                break
-        return value
+    def get(self, key, default=None):
+        return self._settings.get(key, default)
 
     # High-level access API.
     def username(self):
@@ -466,7 +456,8 @@ def set_customfield_executor(issue_name, message):
         exit(1)
 
 def colorise(color, string):
-    if colored and (sys.stdout.isatty() or FORCE_COLOURS):
+    colour_settings = settings.get('ui', {}).get('colours') or 'default'
+    if colored and (colour_settings != 'never') and (sys.stdout.isatty() or FORCE_COLOURS or (colour_settings == 'always')):
         string = (colored.fg(color) + str(string) + colored.attr('reset'))
     return string
 
@@ -1032,9 +1023,9 @@ def commandSlug(ui):
     issue_slug = sluggify(issue_message)
 
     default_slug_format = 'issue/{issue_key}/{slug}'
-    slug_format = settings.get('slug', 'format', 'default', default=default_slug_format)
+    slug_format = settings.get('slug', {}).get('format', {}).get('default', default_slug_format)
     if slug_format.startswith('@'):
-        slug_format = settings.get('slug', 'format', slug_format[1:], default=default_slug_format)
+        slug_format = settings.get('slug', {}).get('format', {}).get(slug_format[1:], default=default_slug_format)
 
     if '--git' in ui:
         slug_format = 'issue/{slug}'
@@ -1440,6 +1431,7 @@ def dispatch(ui, *commands, overrides = {}, default_command=''):
     ui_command = (str(ui) or default_command)
     if not ui_command:
         return
+
     if ui_command in overrides:
         overrides[ui_command](ui)
     else:
