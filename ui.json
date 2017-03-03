@@ -242,6 +242,15 @@
                             "issue label <issue-name> <label>..."
                         ]
                     },
+                    "options": {
+                        "local": [
+                            {
+                                "long": "force",
+                                "short": "f",
+                                "help": "allow adding a label even if it does not exist"
+                            }
+                        ]
+                    },
                     "commands": {
                         "new": {
                             "doc": {

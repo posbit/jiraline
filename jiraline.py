@@ -882,11 +882,12 @@ def commandIssue(ui):
             issue_name, *labels = ui.operands()
             issue_name = expand_issue_name(issue_name)
             known_labels = load_known_labels_list()
-            for label in labels:
-                if label not in known_labels:
-                    print('{}: unknown label: {}'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, label)))
-                    print('{}: to create this label run: "jiraline issue label new {}"'.format(colorise(COLOR_NOTE, 'note'), label))
-                    exit(1)
+            if '--force' not in ui:
+                for label in labels:
+                    if label not in known_labels:
+                        print('{}: unknown label: {}'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, label)))
+                        print('{}: to create this label run: "jiraline issue label new {}"'.format(colorise(COLOR_NOTE, 'note'), label))
+                        exit(1)
             add_shortlog_event_label(issue_name, labels)
             for label in labels:
                 if '--verbose' in ui or len(labels) > 1:
