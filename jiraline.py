@@ -547,7 +547,8 @@ def print_abbrev_issue_summary(issue, ui):
         if assignee:
             assignee = colorise(COLOR_ASSIGNEE, '{}'.format(stringifyAssignee(assignee)))
         assignee_string = colorise(COLOR_ASSIGNEE, 'assignee: {}'.format(assignee))
-        priority = fields.get('priority', {}).get('name')
+        priority_data = (fields.get('priority', {}) or {})
+        priority = priority_data.get('name')
         priority_string = colorise(COLOR_PRIORITY, priority)
         formatted_line = '{}'
         formats = [key]
