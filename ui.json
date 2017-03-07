@@ -351,6 +351,14 @@
                 "no" : [1,1]
             }
         },
+        "merge": {
+            "doc": {
+                "help": "Merge branches based on issue messages and numbers, while recording the merge in Jira"
+            },
+            "operands": {
+                "no": [1, 1]
+            }
+        },
         "slug": {
             "doc": {
                 "help": "Print sluggified issue titles.",

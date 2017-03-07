@@ -1415,6 +1415,54 @@ def commandOpen(ui):
             print(text)
 
 
+def commandMerge(ui):
+    ui = ui.down()
+
+    current_branch = get_current_git_branch()
+    issue_name = expand_issue_name(ui.operands()[0])
+
+    cached = Cache(issue_name)
+    issue_message = cached.get('fields', 'summary')
+    if not issue_message:
+        print('{}: message for issue {} not available, fetching'.format(colorise(COLOR_WARNING, 'warning'), colorise_repr(COLOR_ISSUE_KEY, issue_name)))
+        issue_message = fetch_summary(issue_name)
+        cached.set('fields', 'summary', value=issue_message)
+        cached.store()
+
+    issue_slug = sluggify(issue_message)
+    default_slug_format = 'issue/{issue_key}/{slug}'
+    slug_format = settings.get('slug', {}).get('format', {}).get('default', default_slug_format)
+    if slug_format.startswith('@'):
+        slug_format = settings.get('slug', {}).get('format', {}).get(slug_format[1:], default=default_slug_format)
+
+    branch_to_merge = None
+    try:
+        branch_to_merge = slug_format.format(slug=issue_slug, issue_key=issue_name)
+    except KeyError as e:
+        print('error: required parameter not found: {}'.format(str(e)))
+        exit(1)
+
+    print('{}: merge {} to {}'.format(
+        colorise(COLOR_NOTE, 'note'),
+        colorise_repr('white', branch_to_merge),
+        colorise_repr('white', current_branch),
+    ))
+
+    if branch_to_merge is None:
+        print('error: no branch to merge')
+
+    add_label(issue_name, 'merged-to:{}'.format(current_branch))
+
+    p = subprocess.Popen(('git', 'merge', branch_to_merge), stdout=subprocess.PIPE)
+    output, error = p.communicate()
+    output = output.decode('utf-8').strip()
+    git_exit_code = p.wait()
+    if git_exit_code != 0:
+        print('error: Git error')
+        exit(git_exit_code)
+
+
+
 ################################################################################
 # Program's entry point.
 #
@@ -1454,4 +1502,5 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandFetch,
     commandShortlog,
     commandOpen,
+    commandMerge,
 )
