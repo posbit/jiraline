@@ -692,6 +692,8 @@ def append_shortlog_event(issue_name, log_content):
     shortlog = read_shortlog()
     log_content['issue'] = issue_name
     log_content['timestamp'] = timestamp()
+    if shortlog and (shortlog[-1].get('event') == log_content.get('event') and shortlog[-1].get('issue') == log_content.get('issue')):
+        return
     shortlog.append(log_content)
     write_shortlog(shortlog)
 
