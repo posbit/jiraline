@@ -657,7 +657,7 @@ def get_message_from_editor(template='', fmt={}, join_lines=''):
         message_lines = ifstream.readlines()
         message = [l for l in message_lines if not l.lstrip().startswith('#')]
         if join_lines is not None:
-            message = join_lines.join(message).strip()
+            message = join_lines.join(message)
     return message
 
 def get_shortlog_path():
@@ -1372,7 +1372,7 @@ def commandOpen(ui):
         if (not description.strip()) and '--allow-empty-message' not in ui:
             description = get_message_from_editor('issue_open_message_description', {
                 'summary': get_nice_wall_of_text(summary, indent='#   '),
-            }, join_lines='\n')
+            })
         if (not description.strip()) and '--allow-empty-message' not in ui:
             print('error: aborting due to empty description')
             exit(1)
@@ -1395,6 +1395,7 @@ def commandOpen(ui):
                 'name': assignee_name,
             },
         }
+
         r = requests.post('https://{}.atlassian.net/rest/api/2/issue'.format(settings.get('domain')),
             json={'fields': fields,},
             auth=settings.credentials()
