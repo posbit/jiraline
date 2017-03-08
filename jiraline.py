@@ -1456,9 +1456,7 @@ def commandMerge(ui):
 
     add_label(issue_name, 'merged-to:{}'.format(current_branch))
 
-    p = subprocess.Popen(('git', 'merge', branch_to_merge), stdout=subprocess.PIPE)
-    output, error = p.communicate()
-    output = output.decode('utf-8').strip()
+    p = subprocess.Popen(('git', 'merge', branch_to_merge))
     git_exit_code = p.wait()
     if git_exit_code != 0:
         print('error: Git error')
