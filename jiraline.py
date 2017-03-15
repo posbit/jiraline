@@ -157,6 +157,9 @@ class Settings:
     def __getitem__(self, key):
         return self._settings[key]
 
+    def __contains__(self, key):
+        return (key in self._settings)
+
     @staticmethod
     def get_settings_path():
         return os.path.expanduser(os.path.join('~', '.config', 'jiraline', 'config.json'))
@@ -178,18 +181,17 @@ class Settings:
         return self
 
     # Low-level access API.
-    def get(self, *path, default=None):
-        value = self._settings
-        for key in path:
-            if key not in value and default is None:
-                print('error: key missing from configuration: {}'.format('.'.join(path)))
-                exit(1)
-            if key not in value and default is not None:
-                return default
-            value = value[key]
-            if type(value) is not dict:
-                break
-        return value
+    def data(self):
+        return self._settings
+
+    def keys(self):
+        return self._settings.keys()
+
+    def items(self):
+        return self._settings.items()
+
+    def get(self, key, default=None):
+        return self._settings.get(key, default)
 
     # High-level access API.
     def username(self):
@@ -454,7 +456,8 @@ def set_customfield_executor(issue_name, message):
         exit(1)
 
 def colorise(color, string):
-    if colored and (sys.stdout.isatty() or FORCE_COLOURS):
+    colour_settings = settings.get('ui', {}).get('colours') or 'default'
+    if colored and (colour_settings != 'never') and (sys.stdout.isatty() or FORCE_COLOURS or (colour_settings == 'always')):
         string = (colored.fg(color) + str(string) + colored.attr('reset'))
     return string
 
@@ -544,7 +547,8 @@ def print_abbrev_issue_summary(issue, ui):
         if assignee:
             assignee = colorise(COLOR_ASSIGNEE, '{}'.format(stringifyAssignee(assignee)))
         assignee_string = colorise(COLOR_ASSIGNEE, 'assignee: {}'.format(assignee))
-        priority = fields.get('priority', {}).get('name')
+        priority_data = (fields.get('priority', {}) or {})
+        priority = priority_data.get('name')
         priority_string = colorise(COLOR_PRIORITY, priority)
         formatted_line = '{}'
         formats = [key]
@@ -653,7 +657,7 @@ def get_message_from_editor(template='', fmt={}, join_lines=''):
         message_lines = ifstream.readlines()
         message = [l for l in message_lines if not l.lstrip().startswith('#')]
         if join_lines is not None:
-            message = join_lines.join(message).strip()
+            message = join_lines.join(message)
     return message
 
 def get_shortlog_path():
@@ -688,6 +692,8 @@ def append_shortlog_event(issue_name, log_content):
     shortlog = read_shortlog()
     log_content['issue'] = issue_name
     log_content['timestamp'] = timestamp()
+    if shortlog and (shortlog[-1].get('event') == log_content.get('event') and shortlog[-1].get('issue') == log_content.get('issue')):
+        return
     shortlog.append(log_content)
     write_shortlog(shortlog)
 
@@ -777,7 +783,7 @@ def commandComment(ui):
         }
         if cached.is_cached():
             fmt['issue_summary'] = get_nice_wall_of_text(cached.get('fields.summary', default=summary_not_available).strip(), indent='#   ')
-            fmt['issue_description'] = get_nice_wall_of_text(cached.get('fields.description', default=description_not_available).strip(), indent='#   ')
+            fmt['issue_description'] = get_nice_wall_of_text((cached.get('fields.description', default=description_not_available) or description_not_available).strip(), indent='#   ')
         if '--reply' in ui and cached.is_cached():
             comments = cached.get('fields', 'comment', default={}).get('comments', [])
             if comments:
@@ -878,11 +884,12 @@ def commandIssue(ui):
             issue_name, *labels = ui.operands()
             issue_name = expand_issue_name(issue_name)
             known_labels = load_known_labels_list()
-            for label in labels:
-                if label not in known_labels:
-                    print('{}: unknown label: {}'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, label)))
-                    print('{}: to create this label run: "jiraline issue label new {}"'.format(colorise(COLOR_NOTE, 'note'), label))
-                    exit(1)
+            if '--force' not in ui:
+                for label in labels:
+                    if label not in known_labels:
+                        print('{}: unknown label: {}'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, label)))
+                        print('{}: to create this label run: "jiraline issue label new {}"'.format(colorise(COLOR_NOTE, 'note'), label))
+                        exit(1)
             add_shortlog_event_label(issue_name, labels)
             for label in labels:
                 if '--verbose' in ui or len(labels) > 1:
@@ -993,6 +1000,17 @@ def commandSearch(ui):
         print('error: HTTP {}'.format(r.status_code))
 
 
+def get_current_git_branch():
+    p = subprocess.Popen(('git', 'rev-parse', '--abbrev-ref', 'HEAD'), stdout=subprocess.PIPE)
+    output, error = p.communicate()
+    output = output.decode('utf-8').strip()
+    git_exit_code = p.wait()
+    if git_exit_code != 0:
+        print('error: Git error')
+        exit(git_exit_code)
+    branch_name = output.strip()
+    return branch_name
+
 def commandSlug(ui):
     ui = ui.down()
     issue_name = expand_issue_name(ui.operands()[0])
@@ -1009,9 +1027,9 @@ def commandSlug(ui):
     issue_slug = sluggify(issue_message)
 
     default_slug_format = 'issue/{issue_key}/{slug}'
-    slug_format = settings.get('slug', 'format', 'default', default=default_slug_format)
+    slug_format = settings.get('slug', {}).get('format', {}).get('default', default_slug_format)
     if slug_format.startswith('@'):
-        slug_format = settings.get('slug', 'format', slug_format[1:], default=default_slug_format)
+        slug_format = settings.get('slug', {}).get('format', {}).get(slug_format[1:], default=default_slug_format)
 
     if '--git' in ui:
         slug_format = 'issue/{slug}'
@@ -1033,6 +1051,15 @@ def commandSlug(ui):
     add_shortlog_event_slug(issue_name, issue_slug)
 
     if '--git-branch' in ui:
+        allow_branching_from = settings.data().get('base_branch')
+        if '--allow-branch-from' in ui:
+            allow_branching_from = ui.get('--allow-branch-from')
+        current_git_branch = get_current_git_branch()
+        if allow_branching_from != 'HEAD' and allow_branching_from != current_git_branch:
+            print('{}: branching from {} is not allowed'.format(colorise(COLOR_ERROR, 'error'), colorise_repr(COLOR_LABEL, current_git_branch)))
+            if allow_branching_from is not None:
+                print('{}: only branching from {} is allowed'.format(colorise(COLOR_NOTE, 'note'), colorise_repr(COLOR_LABEL, allow_branching_from)))
+            exit(1)
         r = os.system('git branch {0}'.format(issue_slug))
         r = (r >> 8)
         if r != 0:
@@ -1296,7 +1323,7 @@ def commandOpen(ui):
             print('error: aborting: no project selected')
             exit(1)
 
-        issuetype = None
+        issuetype = str(settings.data().get('default_issue_type'))
         if '-i' in ui:
             issuetype = ui.get('-i')
         if not issuetype:
@@ -1342,11 +1369,11 @@ def commandOpen(ui):
         description = ''
         if '-d' in ui:
             description = ui.get('-d')
-        if not description.strip():
+        if (not description.strip()) and '--allow-empty-message' not in ui:
             description = get_message_from_editor('issue_open_message_description', {
                 'summary': get_nice_wall_of_text(summary, indent='#   '),
-            }, join_lines='\n')
-        if not description.strip():
+            })
+        if (not description.strip()) and '--allow-empty-message' not in ui:
             print('error: aborting due to empty description')
             exit(1)
 
@@ -1368,6 +1395,7 @@ def commandOpen(ui):
                 'name': assignee_name,
             },
         }
+
         r = requests.post('https://{}.atlassian.net/rest/api/2/issue'.format(settings.get('domain')),
             json={'fields': fields,},
             auth=settings.credentials()
@@ -1390,6 +1418,52 @@ def commandOpen(ui):
             print(text)
 
 
+def commandMerge(ui):
+    ui = ui.down()
+
+    current_branch = get_current_git_branch()
+    issue_name = expand_issue_name(ui.operands()[0])
+
+    cached = Cache(issue_name)
+    issue_message = cached.get('fields', 'summary')
+    if not issue_message:
+        print('{}: message for issue {} not available, fetching'.format(colorise(COLOR_WARNING, 'warning'), colorise_repr(COLOR_ISSUE_KEY, issue_name)))
+        issue_message = fetch_summary(issue_name)
+        cached.set('fields', 'summary', value=issue_message)
+        cached.store()
+
+    issue_slug = sluggify(issue_message)
+    default_slug_format = 'issue/{issue_key}/{slug}'
+    slug_format = settings.get('slug', {}).get('format', {}).get('default', default_slug_format)
+    if slug_format.startswith('@'):
+        slug_format = settings.get('slug', {}).get('format', {}).get(slug_format[1:], default=default_slug_format)
+
+    branch_to_merge = None
+    try:
+        branch_to_merge = slug_format.format(slug=issue_slug, issue_key=issue_name)
+    except KeyError as e:
+        print('error: required parameter not found: {}'.format(str(e)))
+        exit(1)
+
+    print('{}: merge {} to {}'.format(
+        colorise(COLOR_NOTE, 'note'),
+        colorise_repr('white', branch_to_merge),
+        colorise_repr('white', current_branch),
+    ))
+
+    if branch_to_merge is None:
+        print('error: no branch to merge')
+
+    p = subprocess.Popen(('git', 'merge', branch_to_merge))
+    git_exit_code = p.wait()
+    if git_exit_code != 0:
+        print('error: Git error')
+        exit(git_exit_code)
+
+    add_label(issue_name, 'merged-to:{}'.format(current_branch))
+
+
+
 ################################################################################
 # Program's entry point.
 #
@@ -1408,6 +1482,7 @@ def dispatch(ui, *commands, overrides = {}, default_command=''):
     ui_command = (str(ui) or default_command)
     if not ui_command:
         return
+
     if ui_command in overrides:
         overrides[ui_command](ui)
     else:
@@ -1428,4 +1503,5 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandFetch,
     commandShortlog,
     commandOpen,
+    commandMerge,
 )

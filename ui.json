@@ -242,6 +242,15 @@
                             "issue label <issue-name> <label>..."
                         ]
                     },
+                    "options": {
+                        "local": [
+                            {
+                                "long": "force",
+                                "short": "f",
+                                "help": "allow adding a label even if it does not exist"
+                            }
+                        ]
+                    },
                     "commands": {
                         "new": {
                             "doc": {
@@ -342,6 +351,14 @@
                 "no" : [1,1]
             }
         },
+        "merge": {
+            "doc": {
+                "help": "Merge branches based on issue messages and numbers, while recording the merge in Jira"
+            },
+            "operands": {
+                "no": [1, 1]
+            }
+        },
         "slug": {
             "doc": {
                 "help": "Print sluggified issue titles.",
@@ -367,6 +384,12 @@
                         "short": "B",
                         "long": "git-branch",
                         "help": "create new Git branch using the slug as branch name"
+                    },
+                    {
+                        "short": "A",
+                        "long": "allow-branch-from",
+                        "arguments": ["branch name:str"],
+                        "help": "override base branch name set in config"
                     },
                     {
                         "short": "C",
@@ -534,6 +557,11 @@
                         "long": "assignee",
                         "arguments": ["name:str"],
                         "help": "add assignee to issue"
+                    },
+                    {
+                        "short": "A",
+                        "long": "allow-empty-message",
+                        "help": "allow empty issue message"
                     }
                 ]
             },
