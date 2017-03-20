@@ -1166,30 +1166,35 @@ def display_shortlog(shortlog, head=None, tail=None):
         shortlog = shortlog[:head]
     if tail is not None:
         shortlog = shortlog[tail:]
-    for event in shortlog:
-        event_name = event['event']
-        event_description = event['parameters']
-        if event_name == 'show':
-            event_description = ''
-        elif event_name == 'slug':
-            event_description = 'sluggified to {}'.format(colorise_repr(COLOR_LABEL, event['parameters']['slug']))
-        elif event_name == 'transition':
-            event_description = 'to status {}'.format(colorise_repr(COLOR_STATUS, event['parameters']['to']))
-        elif event_name == 'comment':
-            comment_lines = event['parameters']['comment'].splitlines()
-            event_description = '{}'.format(comment_lines[0].strip())
-            if len(comment_lines) > 1:
-                event_description += ' (...)'
-        elif event_name == 'label-add':
-            event_description = 'added labels {}'.format(', '.join(map(lambda l: colorise_repr(COLOR_LABEL, l), event['parameters']['labels'])))
-        elif event_name == 'open-issue':
-            event_description = 'opened issue: {}'.format(colorise(COLOR_NOTE, event_description.get('summary')))
-        else:
-            # if no special description formatting is provided, just display name of the event
-            event_description = ''
-        if event_description:
-            event_description = ': {}'.format(event_description)
-        print('{} {}{}'.format(colorise(COLOR_ISSUE_KEY, event['issue']), event_name, event_description))
+    try:
+        for event in shortlog:
+            event_name = event['event']
+            event_description = event['parameters']
+            if event_name == 'show':
+                event_description = ''
+            elif event_name == 'slug':
+                event_description = 'sluggified to {}'.format(colorise_repr(COLOR_LABEL, event['parameters']['slug']))
+            elif event_name == 'transition':
+                event_description = 'to status {}'.format(colorise_repr(COLOR_STATUS, event['parameters']['to']))
+            elif event_name == 'comment':
+                comment_lines = event['parameters']['comment'].splitlines()
+                event_description = '{}'.format(comment_lines[0].strip())
+                if len(comment_lines) > 1:
+                    event_description += ' (...)'
+            elif event_name == 'label-add':
+                event_description = 'added labels {}'.format(', '.join(map(lambda l: colorise_repr(COLOR_LABEL, l), event['parameters']['labels'])))
+            elif event_name == 'open-issue':
+                event_description = 'opened issue: {}'.format(colorise(COLOR_NOTE, event_description.get('summary')))
+            else:
+                # if no special description formatting is provided, just display name of the event
+                event_description = ''
+            if event_description:
+                event_description = ': {}'.format(event_description)
+            print('{} {}{}'.format(colorise(COLOR_ISSUE_KEY, event['issue']), event_name, event_description))
+    except BrokenPipeError as e:
+        # just silence this
+        # this exception is thrown when shortlog is piped to head
+        pass
 
 def _bug_event_without_assigned_weight(event):
     print('{}: {}: event {} does not have a weight assigned'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ERROR, 'bug'), colorise_repr(COLOR_LABEL, event['event'])))
