@@ -951,8 +951,9 @@ def commandSearch(ui):
         conditions.append('key >= {}'.format(expand_issue_name(ui.get('-L'), ui.get('-p'))))
     if '--key-upper' in ui:
         conditions.append('key <= {}'.format(expand_issue_name(ui.get('-U'), ui.get('-p'))))
-    if "-s" in ui:
-        conditions.append('status = {}'.format(ui.get("-s")))
+    if '-s' in ui:
+        first = lambda seq: seq[0]
+        conditions.append('status in ({})'.format(', '.join(map(first, ui.get('-s')))))
     if "-j" in ui:
         conditions.append('{}'.format(ui.get("-j")))
     if "-n" in ui:

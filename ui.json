@@ -78,6 +78,7 @@
                         "long":"status",
                         "short": "s",
                         "help": "status identifier",
+                        "plural": true,
                         "arguments" : ["status:str"]
                     },
                     {
