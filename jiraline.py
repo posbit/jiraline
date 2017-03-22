@@ -863,8 +863,12 @@ def commandIssue(ui):
                     for t in transitions:
                         print(t["name"])
                 else:
+                    current_status = cached.get('fields', 'status', default={}).get('name')
                     for t in transitions:
-                        print(t["id"], t["name"])
+                        key_colour, name_colour = 'light_red', 'white'
+                        if t['name'] == current_status:
+                            key_colour, name_colour = COLOR_STATUS, COLOR_STATUS
+                        print('{} {} ({})'.format(colorise(key_colour, t['id']), colorise(name_colour, t['name']), colorise(key_colour, sluggify(t['name']))))
             elif r.status_code == 404:
                 print("error: the requested issue is not found or the user does not have permission to view it")
                 exit(1)
