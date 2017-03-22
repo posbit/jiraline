@@ -641,7 +641,7 @@ def expand_issue_name(issue_name, project=None):
         issue_name = '{}-{}'.format((project if project is not None else settings.get('default_project')), issue_name)
     return issue_name
 
-def get_message_from_editor(template='', fmt={}, join_lines=''):
+def get_message_from_editor(template='', fmt={}, join_lines='\n'):
     editor = os.getenv('EDITOR', 'vi')
     message_path = os.path.expanduser(os.path.join('~', '.local', 'share', 'jiraline', 'tmp_message'))
     if template and format:
