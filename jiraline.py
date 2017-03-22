@@ -552,7 +552,7 @@ def print_abbrev_issue_summary(issue, ui):
         priority_string = colorise(COLOR_PRIORITY, priority)
         formatted_line = '{}'
         formats = [key]
-        if '--status' not in ui:
+        if '--status' not in ui or ui.get('--verbose') > 1:
             formatted_line +=  ' [{}/{}]'
             formats.append(colorise(COLOR_STATUS, '{}:{}'.format(fields.get('status', {}).get('id', 0), fields.get('status', {}).get('name', ''))))
             formats.append(priority_string)
