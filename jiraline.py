@@ -840,6 +840,17 @@ def commandAssign(ui):
             print("Either the issue or the user does not exist.")
 
 
+def get_list_of_transitions_for(issue_name):
+    r = connection.get('/rest/api/2/issue/{}/transitions'.format(issue_name))
+    transitions = []
+    if r.status_code == 200:
+        transitions = json.loads(r.text).get('transitions', [])
+    elif r.status_code == 404:
+        raise IssueNotFoundException(issue_name)
+    else:
+        raise IssueException(issue_name, r.status_code)
+    return transitions
+
 def commandIssue(ui):
     ui = ui.down()
     issue_name, cached = None, None
@@ -848,33 +859,39 @@ def commandIssue(ui):
     if str(ui) == 'transition':
         issue_name, cached = get_issue_name_cache_pair(ui)
         if '--to' in ui:
-            for to_id in ui.get('-t'):
-                transition_to(issue_name, *to_id)
-                add_shortlog_event_transition(issue_name, *to_id)
+            transition_through = list(map(lambda seq: seq[0], ui.get('-t')))
+
+            transitions = {}
+            if not all(map(lambda each: each.isdigit(), transition_through)):
+                transitions = dict(map(lambda each: (sluggify(each.get('name')), each.get('id'),), get_list_of_transitions_for(issue_name)))
+
+            try:
+                transition_through = list(map(lambda each: (each if each.isdigit() else transitions[sluggify(each)]), transition_through))
+            except KeyError as e:
+                key = str(e)[1:-1]
+                print('{}: not a valid transition name: {}'.format(colorise(COLOR_ERROR, 'error'), colorise_repr('white', key)))
+                exit(1)
+
+            for to_id in transition_through:
+                if '--verbose' in ui:
+                    print('{} -> {}'.format(colorise(COLOR_ISSUE_KEY, issue_name), colorise(COLOR_STATUS, to_id)))
+                transition_to(issue_name, to_id)
+                add_shortlog_event_transition(issue_name, to_id)
         else:
-            r = connection.get('/rest/api/2/issue/{}/transitions'.format(issue_name))
-            if r.status_code == 200:
-                response = json.loads(r.text)
-                transitions = response.get('transitions', [])
-                if '--ids' in ui:
-                    for t in transitions:
-                        print(t["id"])
-                elif '--names' in ui:
-                    for t in transitions:
-                        print(t["name"])
-                else:
-                    current_status = cached.get('fields', 'status', default={}).get('name')
-                    for t in transitions:
-                        key_colour, name_colour = 'light_red', 'white'
-                        if t['name'] == current_status:
-                            key_colour, name_colour = COLOR_STATUS, COLOR_STATUS
-                        print('{} {} ({})'.format(colorise(key_colour, t['id']), colorise(name_colour, t['name']), colorise(key_colour, sluggify(t['name']))))
-            elif r.status_code == 404:
-                print("error: the requested issue is not found or the user does not have permission to view it")
-                exit(1)
+            transitions = get_list_of_transitions_for(issue_name)
+            if '--ids' in ui:
+                for t in transitions:
+                    print(t["id"])
+            elif '--names' in ui:
+                for t in transitions:
+                    print(t["name"])
             else:
-                print('error: HTTP {}'.format(r.status_code))
-                exit(1)
+                current_status = cached.get('fields', 'status', default={}).get('name')
+                for t in sorted(transitions, key = lambda each: int(each.get('id'))):
+                    key_colour, name_colour = 'light_red', 'white'
+                    if t['name'] == current_status:
+                        key_colour, name_colour = COLOR_STATUS, COLOR_STATUS
+                    print('{} {} ({})'.format(colorise(key_colour, t['id']), colorise(name_colour, t['name']), colorise(key_colour, sluggify(t['name']))))
     elif str(ui) == 'issue' and cached.is_cached():
         add_shortlog_event_show(issue_name)
         show_issue(issue_name, ui, cached)
