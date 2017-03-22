@@ -958,7 +958,7 @@ def commandSearch(ui):
     if "-n" in ui:
         request_content["maxResults"] = ui.get("-n")
 
-    request_content["jql"] = " AND ".join(conditions)
+    request_content['jql'] = ' AND '.join(conditions)
     r = connection.get('/rest/api/2/search', params=request_content)
     if r.status_code == 200:
         response = json.loads(r.text)
