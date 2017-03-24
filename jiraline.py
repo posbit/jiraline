@@ -102,12 +102,21 @@ class Cache:
         if not lazy:
             self.load()
 
+    def __setitem__(self, k, v):
+        self._data[k] = v
+
+    def __getitem__(self, k):
+        return self._data[k]
+
     @staticmethod
     def dir():
         return os.path.join(os.path.expanduser('~'), '.cache', 'jiraline')
 
     def path(self):
         return os.path.join(os.path.expanduser('~'), '.cache', 'jiraline', '{}.json'.format(self._issue_key))
+
+    def data(self):
+        return self._data
 
     def raw(self):
         return self._data.copy()
@@ -249,6 +258,7 @@ class Connection:
 
     def put(self, url, **kwargs):
         return requests.put(self.url(url), auth=self._auth(), **kwargs)
+
     def post(self, url, **kwargs):
         return requests.post(self.url(url), auth=self._auth(), **kwargs)
 
