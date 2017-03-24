@@ -805,6 +805,7 @@ def commandComment(ui):
             if comments:
                 fmt['text'] = '> {}'.format(comments[-1].get('body', ''))
         message = get_message_from_editor('issue_comment_message', fmt)
+        print(message)
     if not message.strip():
         print('error: aborting due to empty message')
         exit(1)
@@ -1505,6 +1506,124 @@ def commandMerge(ui):
 
     add_label(issue_name, 'merged-to:{}'.format(current_branch))
 
+def command_timer_start(ui):
+    ui = ui.down()
+
+    issue_key, cached = get_issue_name_cache_pair(ui)
+
+    user_key = settings.get('credentials', {}).get('user')
+    user_id = settings.get('credentials', {}).get('user')
+    project_key = settings.get('default_project_key')
+    project_id = settings.get('default_project_id')
+    issue_id = cached.data().get('id')
+    issuetype_id = cached.data().get('fields', {}).get('issuetype', {}).get('id')
+
+    if user_key is None:
+        error_and_exit('no user found: set {} in config file'.format(colorise_repr('white', 'credentials.user')))
+    if user_id is None:
+        error_and_exit('no user found: set {} in config file'.format(colorise_repr('white', 'credentials.user')))
+    if project_key is None:
+        error_and_exit('no project key: set {} in config file'.format(colorise_repr('white', 'default_project_key')))
+    if project_id is None:
+        error_and_exit('no project key: set {} in config file'.format(colorise_repr('white', 'default_project_id')))
+    if issue_id is None:
+        error_and_exit('issue id not found: run {}'.format(colorise_repr('white', 'jiraline fetch {}'.format(issue_key))))
+    if issuetype_id is None:
+        error_and_exit('issue type id not found: run {}'.format(colorise_repr('white', 'jiraline fetch {}'.format(issue_key))))
+
+    product_context = {
+        "user.key": user_key,
+        "user.id": user_id,
+        "project.key": project_key,
+        "project.id": project_id,
+        "issue.id": issue_id,
+        "issue.key": issue_key,
+        "issuetype.id": issuetype_id,
+    }
+
+    request_content = {
+        'plugin-key': 'com.gebsun.plugins.jira.startwork',
+        'product-context': json.dumps(product_context),
+        'key': 'start-issue-timer',
+        'width': '100%',
+        'height': '100%',
+        'classifier': 'json',
+    }
+
+    r = requests.post(
+        'https://{domain}.atlassian.net/plugins/servlet/ac/com.gebsun.plugins.jira.startwork/start-issue-timer'.format(
+            domain = settings.get('domain'),
+        ),
+        params=request_content,
+        auth=settings.credentials()
+    )
+    print(r.status_code)
+    print(r.text)
+    exit(int(not (r.status_code == 200)))
+
+def command_timer_stop(ui):
+    ui = ui.down()
+
+    issue_key, cached = get_issue_name_cache_pair(ui)
+
+    user_key = settings.get('credentials', {}).get('user')
+    user_id = settings.get('credentials', {}).get('user')
+    project_key = settings.get('default_project_key')
+    project_id = settings.get('default_project_id')
+    issue_id = cached.data().get('id')
+    issuetype_id = cached.data().get('fields', {}).get('issuetype', {}).get('id')
+
+    if user_key is None:
+        error_and_exit('no user found: set {} in config file'.format(colorise_repr('white', 'credentials.user')))
+    if user_id is None:
+        error_and_exit('no user found: set {} in config file'.format(colorise_repr('white', 'credentials.user')))
+    if project_key is None:
+        error_and_exit('no project key: set {} in config file'.format(colorise_repr('white', 'default_project_key')))
+    if project_id is None:
+        error_and_exit('no project key: set {} in config file'.format(colorise_repr('white', 'default_project_id')))
+    if issue_id is None:
+        error_and_exit('issue id not found: run {}'.format(colorise_repr('white', 'jiraline fetch {}'.format(issue_key))))
+    if issuetype_id is None:
+        error_and_exit('issue type id not found: run {}'.format(colorise_repr('white', 'jiraline fetch {}'.format(issue_key))))
+
+    product_context = {
+        "user.key": user_key,
+        "user.id": user_id,
+        "project.key": project_key,
+        "project.id": project_id,
+        "issue.id": issue_id,
+        "issue.key": issue_key,
+        "issuetype.id": issuetype_id,
+    }
+
+    request_content = {
+        'plugin-key': 'com.gebsun.plugins.jira.startwork',
+        'product-context': json.dumps(product_context),
+        'key': 'stop-issue-timer',
+        'width': '100%',
+        'height': '100%',
+        'classifier': 'json',
+    }
+
+    r = requests.post(
+        'https://{domain}.atlassian.net/plugins/servlet/ac/com.gebsun.plugins.jira.startwork/start-issue-timer'.format(
+            domain = settings.get('domain'),
+        ),
+        params=request_content,
+        auth=settings.credentials()
+    )
+    print(r.status_code)
+    print(r.text)
+    exit(int(not (r.status_code == 200)))
+
+def commandTimer(ui):
+    ui = ui.down()
+
+    if str(ui) == 'start':
+        command_timer_start(ui)
+    elif str(ui) == 'stop':
+        command_timer_stop(ui)
+
 
 
 ################################################################################
@@ -1547,4 +1666,5 @@ dispatch(ui,        # first: pass the UI object to dispatch
     commandShortlog,
     commandOpen,
     commandMerge,
+    commandTimer,
 )

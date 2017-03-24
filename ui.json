@@ -583,6 +583,27 @@
                     }
                 }
             }
+        },
+        "timer": {
+            "doc": {
+                "help": "Start or stop a timer running on an issue",
+                "usage": [
+                    "start <issue>",
+                    "stop <issue>"
+                ]
+            },
+            "commands": {
+                "start": {
+                    "doc": {
+                        "help": "Start or stop a timer running on an issue"
+                    }
+                },
+                "stop": {
+                    "doc": {
+                        "help": "Start or stop a timer running on an issue"
+                    }
+                }
+            }
         }
     },
     "operands": {
