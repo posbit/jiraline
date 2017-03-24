@@ -596,6 +596,8 @@ def fetch_issue(issue_name, fatal=True):
         cached.set('key', value=issue_name)
         for k, v in response.get('fields', {}).items():
             cached.set('fields', k, value=v)
+        for k, v in response.items():
+            cached[k] = v
         cached.store()
     elif r.status_code == 404:
         msg = 'the requested issue is not found or the user does not have permission to view it.'
