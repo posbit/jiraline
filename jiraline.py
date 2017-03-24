@@ -474,6 +474,10 @@ def colorise(color, string):
 def colorise_repr(color, string):
     return "'{}'".format(colorise(color, repr(string)[1:-1]))
 
+def error_and_exit(message, exit_code = 1):
+    print('{}: {}'.format(colorise(COLOR_ERROR, 'error'), message))
+    exit(exit_code)
+
 def sluggify(issue_message):
     return '-'.join(re.compile('[^ a-zA-Z0-9_]').sub(' ', unidecode.unidecode(issue_message).lower()).split())
 
