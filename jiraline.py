@@ -20,7 +20,7 @@ except ImportError:
 
 
 # Jiraline version
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
@@ -370,6 +370,14 @@ def transition_to(issue_name, to_id):
         exit(1)
     elif r.status_code == 500:
         print("error: 500 Internal server error")
+        exit(1)
+    elif r.status_code >= 200 and r.status_code <= 299:
+        # ok, do nothing
+        pass
+    else:
+        print('{}: HTTP {}'.format(colorise(COLOR_ERROR, 'error'), r.status_code))
+        print('{}: returned text was:'.format(colorise(COLOR_NOTE, 'note')))
+        print(r.text)
         exit(1)
 
 def add_label(issue_name, label):
