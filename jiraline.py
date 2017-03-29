@@ -353,6 +353,12 @@ def stringify_reporter(person):
         pass
     return fmt.format(display_name, user_name, email_address)
 
+def stringify_status(status):
+    return colorise(COLOR_STATUS, '{}:{}'.format(status.get('id', 0), status.get('name', 'unknown')))
+
+def stringify_priority(priority):
+    return colorise(COLOR_PRIORITY, priority.get('name'))
+
 def transition_to(issue_name, to_id):
     transition = {
         "transition": {
@@ -510,6 +516,14 @@ def displayBasicInformation(data):
     assignee = fields('assignee')
     if assignee:
         print('Assignee: {}'.format(stringify_reporter(assignee)))
+
+    status = fields('status')
+    if status:
+        print('Status:   {}'.format(stringify_status(status)))
+
+    priority = fields('priority')
+    if priority:
+        print('Priority: {}'.format(stringify_priority(priority)))
 
     created = fields('created')
     if created:
