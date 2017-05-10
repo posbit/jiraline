@@ -28,6 +28,10 @@
                 "short": "v",
                 "plural": true,
                 "help": "display verbose output"
+            },
+            {
+                "long": "debug",
+                "help": "display debugging output"
             }
         ],
         "local": [
