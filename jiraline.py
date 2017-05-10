@@ -1008,8 +1008,11 @@ def commandSearch(ui):
         'fieldsByKeys': False,
     }
     conditions = []
+    first = lambda seq: seq[0]
     if "-p" in ui:
         conditions.append('project = {}'.format(ui.get("-p")))
+    if '-P' in ui:
+        conditions.append('priority in ({})'.format(', '.join(map(str, map(first, ui.get('-P'))))))
     if "-a" in ui:
         conditions.append('assignee = {}'.format(ui.get("-a")))
     if '--reporter' in ui:
@@ -1019,7 +1022,6 @@ def commandSearch(ui):
     if '--key-upper' in ui:
         conditions.append('key <= {}'.format(expand_issue_name(ui.get('-U'), ui.get('-p'))))
     if '-s' in ui:
-        first = lambda seq: seq[0]
         conditions.append('status in ({})'.format(', '.join(map(first, ui.get('-s')))))
     if "-j" in ui:
         conditions.append('{}'.format(ui.get("-j")))

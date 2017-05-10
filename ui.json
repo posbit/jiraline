@@ -73,6 +73,13 @@
                         "help": "set lower bound for issue keys"
                     },
                     {
+                        "long":"priority",
+                        "short": "P",
+                        "help": "priority id",
+                        "arguments" : ["int"],
+                        "plural": true
+                    },
+                    {
                         "long":"project",
                         "short": "p",
                         "help": "project identifier",
