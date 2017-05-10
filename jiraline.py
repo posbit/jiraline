@@ -1260,10 +1260,16 @@ def display_shortlog(shortlog, head=None, tail=None):
                 event_description = 'opened issue: {}'.format(colorise(COLOR_NOTE, event_description.get('summary')))
             else:
                 # if no special description formatting is provided, just display name of the event
-                event_description = ''
+                event_description = '\b\b'
             if event_description:
-                event_description = ': {}'.format(event_description)
-            print('{} {}{}'.format(colorise(COLOR_ISSUE_KEY, event['issue']), event_name, event_description))
+                event_description = '{}'.format(event_description)
+            event_datetime = datetime.datetime.utcfromtimestamp(event.get('timestamp')).strftime('%Y-%m-%d %H:%M:%S')
+            print('{issue_key} [{event_datetime}] {event_name}: {event_description}'.format(
+                issue_key = colorise(COLOR_ISSUE_KEY, event['issue']),
+                event_datetime = colorise('cyan', event_datetime),
+                event_name = event_name,
+                event_description = event_description,
+            ))
     except BrokenPipeError as e:
         # just silence this
         # this exception is thrown when shortlog is piped to head
