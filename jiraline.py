@@ -592,13 +592,13 @@ def print_abbrev_issue_summary(issue, ui):
             assignee = colorise(COLOR_ASSIGNEE, '{}'.format(stringifyAssignee(assignee)))
         assignee_string = colorise(COLOR_ASSIGNEE, 'assignee: {}'.format(assignee))
         priority_data = (fields.get('priority', {}) or {})
-        priority = priority_data.get('name')
+        priority = '{}:{}'.format(priority_data.get('id'), priority_data.get('name'))
         priority_string = colorise(COLOR_PRIORITY, priority)
         formatted_line = '{}'
         formats = [key]
         if '--status' not in ui or ui.get('--verbose') > 1:
             formatted_line +=  ' [{}/{}]'
-            formats.append(colorise(COLOR_STATUS, '{}:{}'.format(fields.get('status', {}).get('id', 0), fields.get('status', {}).get('name', ''))))
+            formats.append(colorise(COLOR_STATUS, '{}:{}'.format(fields.get('status', {}).get('id', 0), fields.get('status', {}).get('name', '<Unknown status>'))))
             formats.append(priority_string)
         formatted_line += ' {}'
         formats.append(summary)
