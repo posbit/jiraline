@@ -1067,7 +1067,8 @@ def commandSearch(ui):
                 )
                 print(message_line)
     else:
-        print('error: HTTP {}'.format(r.status_code))
+        print('{}: HTTP {}'.format(colorise(COLOR_ERROR, 'error'), r.status_code))
+        print(r.text)
 
 
 def get_current_git_branch():
