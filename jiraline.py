@@ -509,6 +509,14 @@ def displayBasicInformation(data):
 
     fields = lambda *path, default=None: (data.get('fields', *path, default=default) or default)
 
+    domain = settings.get('domain')
+    if domain is not None:
+        # https://posbit.atlassian.net/browse/IP-3686
+        print('URL:      https://{domain}.atlassian.net/browse/{issue_key}'.format(
+            domain = domain,
+            issue_key = data.get('key'),
+        ))
+
     reporter = fields('reporter')
     if reporter:
         print('Reporter: {}'.format(stringify_reporter(reporter)))
