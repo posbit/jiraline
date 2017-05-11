@@ -20,7 +20,7 @@ except ImportError:
 
 
 # Jiraline version
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 
 filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
@@ -1123,6 +1123,12 @@ def commandSlug(ui):
 
     add_shortlog_event_slug(issue_name, issue_slug)
 
+    if '--exists' in ui:
+        sp = subprocess.Popen(('git', 'show', issue_slug,), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        sp.communicate()
+        r = sp.wait()
+        print('{} exists: {}'.format(colorise_repr('white', issue_slug), (colorise('green', 'yes') if r == 0 else colorise('light_red', 'no'))))
+        exit(r)
     if '--git-branch' in ui:
         allow_branching_from = settings.data().get('base_branch')
         if '--allow-branch-from' in ui:

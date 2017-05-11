@@ -410,6 +410,12 @@
                         "help": "checkout Git branch with the same name as generated slug"
                     },
                     {
+                        "long": "exists",
+                        "short": "e",
+                        "help": "check if branch with generated name exists",
+                        "conflicts": ["--git-branch", "--git-checkout"]
+                    },
+                    {
                         "short": "f",
                         "long": "format",
                         "arguments": ["format:str"],
