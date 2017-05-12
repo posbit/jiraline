@@ -1084,6 +1084,20 @@ def get_current_git_branch():
     branch_name = output.strip()
     return branch_name
 
+def get_git_remotes():
+    p = subprocess.Popen(('git', 'remote',), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    output, _ = p.communicate()
+    output = output.decode('utf-8').strip()
+    git_exit_code = p.wait()
+    if git_exit_code != 0:
+        print('error: Git error')
+        exit(git_exit_code)
+    remotes = output.splitlines()
+    if 'origin' in remotes:
+        remotes.remove('origin')
+        remotes.insert(0, 'origin')
+    return remotes
+
 def commandSlug(ui):
     ui = ui.down()
     issue_name = expand_issue_name(ui.operands()[0])
@@ -1121,14 +1135,26 @@ def commandSlug(ui):
             print('error: required parameter not found: {}'.format(str(e)))
             exit(1)
 
-    add_shortlog_event_slug(issue_name, issue_slug)
+    if '--exists' not in ui:
+        add_shortlog_event_slug(issue_name, issue_slug)
 
     if '--exists' in ui:
-        sp = subprocess.Popen(('git', 'show', issue_slug,), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        sp.communicate()
-        r = sp.wait()
-        print('{} exists: {}'.format(colorise_repr('white', issue_slug), (colorise('green', 'yes') if r == 0 else colorise('light_red', 'no'))))
-        exit(r)
+        branch_name_candidates = [ '{}', ] + [ 'remotes/{}/{{}}'.format(each) for each in get_git_remotes() ]
+        exists_as = None
+        for each in branch_name_candidates:
+            each = each.format(issue_slug)
+            sp = subprocess.Popen(('git', 'show', each,), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            sp.communicate()
+            r = sp.wait()
+            if r == 0:
+                exists_as = each
+                break
+        print('{} exists: {}{}'.format(
+            colorise_repr('white', issue_slug),
+            (colorise('green', 'yes') if exists_as is not None else colorise('light_red', 'no')),
+            ('' if (exists_as == issue_slug or exists_as is None) else ' (as {})'.format(colorise_repr('white', exists_as))),
+        ))
+        exit(int(exists_as is None))
     if '--git-branch' in ui:
         allow_branching_from = settings.data().get('base_branch')
         if '--allow-branch-from' in ui:
