@@ -1608,16 +1608,23 @@ def dispatch(ui, *commands, overrides = {}, default_command=''):
                 cmd(ui)
                 break
 
-dispatch(ui,        # first: pass the UI object to dispatch
-    commandComment,    # second: pass command handling functions
-    commandAssign,
-    commandIssue,
-    commandSearch,
-    commandSlug,
-    commandEstimate,
-    commandPin,
-    commandFetch,
-    commandShortlog,
-    commandOpen,
-    commandMerge,
-)
+def main():
+    try:
+        dispatch(ui,        # first: pass the UI object to dispatch
+            commandComment,    # second: pass command handling functions
+            commandAssign,
+            commandIssue,
+            commandSearch,
+            commandSlug,
+            commandEstimate,
+            commandPin,
+            commandFetch,
+            commandShortlog,
+            commandOpen,
+            commandMerge,
+        )
+    except KeyboardInterrupt:
+        print() # print a newline
+        exit(1)
+
+main()
