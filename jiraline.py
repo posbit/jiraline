@@ -580,7 +580,7 @@ def displayComments(comments):
 def print_abbrev_issue_summary(issue, ui):
     key = issue.get('key', '<undefined>')
     fields = issue.get('fields', {})
-    summary = fields.get('summary', '')
+    summary = fields.get('summary', '').strip()
     if colored:
         key = colorise(COLOR_ISSUE_KEY, key)
 
