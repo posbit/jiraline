@@ -20,7 +20,7 @@ except ImportError:
 
 
 # Jiraline version
-__version__ = '0.1.5'
+__version__ = '0.1.6'
 
 
 filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
@@ -1577,7 +1577,9 @@ def commandMerge(ui):
         print('error: Git error')
         exit(git_exit_code)
 
-    add_label(issue_name, 'merged-to:{}'.format(current_branch))
+    label = 'merged-to:{}'.format(current_branch)
+    add_label(issue_name, label)
+    add_shortlog_event_label(issue_name, [label])
 
 
 
