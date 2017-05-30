@@ -510,6 +510,20 @@
                         "long": "tail",
                         "arguments": ["count:int"],
                         "help": "display N tail entries"
+                    },
+                    {
+                        "long": "issue",
+                        "short": "i",
+                        "arguments": ["issue key:str"],
+                        "plural": true,
+                        "help": "include only selected issues"
+                    },
+                    {
+                        "long": "event",
+                        "short": "e",
+                        "arguments": ["event type:str"],
+                        "plural": true,
+                        "help": "include only selected event types"
                     }
                 ]
             },

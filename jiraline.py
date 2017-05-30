@@ -20,7 +20,7 @@ except ImportError:
 
 
 # Jiraline version
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 
 
 filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
@@ -1267,7 +1267,11 @@ def commandFetch(ui):
             print('{}: failed to fetch issue {}'.format(colorise(COLOR_WARNING, 'warning'), colorise(COLOR_ISSUE_KEY, issue_name)))
 
 
-def display_shortlog(shortlog, head=None, tail=None):
+def display_shortlog(shortlog, issues = (), event_types = (), head=None, tail=None):
+    if issues:
+        shortlog = list(filter(lambda each: (each['issue'] in issues), shortlog))
+    if event_types:
+        shortlog = list(filter(lambda each: (each['event'] in event_types), shortlog))
     if head is not None:
         shortlog = shortlog[:head]
     if tail is not None:
@@ -1426,7 +1430,11 @@ def commandShortlog(ui):
             head = ui.get('-H')
         if '--tail' in ui:
             tail = ui.get('-T')
-        display_shortlog(shortlog, head=head, tail=tail)
+
+        first = lambda seq: seq[0]
+        issues = tuple(map(first, ui.get('--issue')))
+        event_types = tuple(map(first, ui.get('--event')))
+        display_shortlog(shortlog, head=head, tail=tail, issues=issues, event_types=event_types)
 
 
 def commandOpen(ui):
