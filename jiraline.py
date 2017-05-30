@@ -20,7 +20,7 @@ except ImportError:
 
 
 # Jiraline version
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 
 filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
@@ -730,7 +730,7 @@ def write_shortlog(shortlog):
     with open(os.path.join(pth, 'shortlog.json'), 'w') as ofstream:
         ofstream.write(json.dumps(shortlog[-settings.get('shortlog_size', default=80):]))
 
-def append_shortlog_event(issue_name, log_content):
+def append_shortlog_event(issue_name, log_content, noise = 0):
     issue_log_name = '{}.{}.json'.format(timestamp(), issue_name)
     pth = get_shortlog_path()
     if not os.path.isdir(pth):
@@ -738,6 +738,7 @@ def append_shortlog_event(issue_name, log_content):
     shortlog = read_shortlog()
     log_content['issue'] = issue_name
     log_content['timestamp'] = timestamp()
+    log_content['noise'] = noise
     if shortlog and (shortlog[-1].get('event') == log_content.get('event') and shortlog[-1].get('issue') == log_content.get('issue')):
         return
     shortlog.append(log_content)
@@ -749,19 +750,19 @@ def add_shortlog_event_transition(issue_name, to):
         'parameters': {
             'to': to,
         },
-    })
+    }, noise = 0)
 
 def add_shortlog_event_fetch(issue_name):
     append_shortlog_event(issue_name, log_content = {
         'event': 'fetch',
         'parameters': {},
-    })
+    }, noise = 1)
 
 def add_shortlog_event_show(issue_name):
     append_shortlog_event(issue_name, log_content = {
         'event': 'show',
         'parameters': {},
-    })
+    }, noise = 2)
 
 def add_shortlog_event_slug(issue_name, slug):
     append_shortlog_event(issue_name, log_content = {
@@ -777,7 +778,7 @@ def add_shortlog_event_label(issue_name, labels):
         'parameters': {
             'labels': labels,
         },
-    })
+    }, noise = 1)
 
 def add_shortlog_event_comment(issue_name, comment):
     append_shortlog_event(issue_name, log_content = {
