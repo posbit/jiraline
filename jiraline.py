@@ -502,7 +502,7 @@ def get_issue_name_cache_pair(ui):
     return (issue_name, cached)
 
 def get_nice_wall_of_text(s, indent='    '):
-    return textwrap.indent('\n'.join(textwrap.wrap(s)), indent)
+    return textwrap.indent(s, indent)
 
 def displayBasicInformation(data):
     print(colorise(COLOR_ISSUE_KEY, 'issue {}'.format(data.get('key'))))
