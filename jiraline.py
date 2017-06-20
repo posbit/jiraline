@@ -1486,7 +1486,7 @@ def commandOpen(ui):
         if '-s' in ui:
             summary = ui.get('-s')
         if not summary.strip():
-            summary = get_message_from_editor('issue_open_message', {'what': 'summary'})
+            summary = get_message_from_editor('issue_open_message', {'what': 'summary'}, join_lines='')
         if not summary.strip():
             print('error: aborting due to empty summary')
             exit(1)
@@ -1497,7 +1497,7 @@ def commandOpen(ui):
         if (not description.strip()) and '--allow-empty-message' not in ui:
             description = get_message_from_editor('issue_open_message_description', {
                 'summary': get_nice_wall_of_text(summary, indent='#   '),
-            })
+            }, join_lines = '')
         if (not description.strip()) and '--allow-empty-message' not in ui:
             print('error: aborting due to empty description')
             exit(1)
