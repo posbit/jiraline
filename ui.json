@@ -368,6 +368,15 @@
             "doc": {
                 "help": "Merge branches based on issue messages and numbers, while recording the merge in Jira"
             },
+            "options": {
+                "local": [
+                    {
+                        "long": "record",
+                        "short": "r",
+                        "help": "do not run 'git merge ...' command, just record the fact that the merge happened"
+                    }
+                ]
+            },
             "operands": {
                 "no": [1, 1]
             }
