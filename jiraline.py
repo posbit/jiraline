@@ -835,7 +835,7 @@ def commandComment(ui):
             comments = cached.get('fields', 'comment', default={}).get('comments', [])
             if comments:
                 fmt['text'] = '> {}'.format(comments[-1].get('body', ''))
-        message = get_message_from_editor('issue_comment_message', fmt)
+        message = get_message_from_editor('issue_comment_message', fmt, join_lines='')
     if not message.strip():
         print('error: aborting due to empty message')
         exit(1)
