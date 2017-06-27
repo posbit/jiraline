@@ -20,7 +20,7 @@ except ImportError:
 
 
 # Jiraline version
-__version__ = '0.1.7'
+__version__ = '0.1.8'
 
 
 filename_ui = os.path.expanduser('~/.local/share/jiraline/ui.json')
