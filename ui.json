@@ -623,6 +623,57 @@
                     }
                 }
             }
+        },
+        "stack": {
+            "doc": {
+                "help": "Push issues to stack as a memory of what you have been doing"
+            },
+            "commands": {
+                "ls": {
+                    "doc": {
+                        "help": "List issues on the stack"
+                    }
+                },
+                "push": {
+                    "doc": {
+                        "help": "Push an issue to the stack"
+                    },
+                    "operands": {
+                        "no": [1, 1]
+                    }
+                },
+                "pop": {
+                    "doc": {
+                        "help": "Pop an issue from the stack"
+                    },
+                    "operands": {
+                        "no": [0, 0]
+                    },
+                    "options": {
+                        "local": [
+                            {
+                                "long": "index",
+                                "short": "i",
+                                "arguments": ["index to pop:int"],
+                                "help": "pop non top-most index, counted from 1"
+                            }
+                        ]
+                    }
+                },
+                "top": {
+                    "doc": {
+                        "help": "Display issue on top of the stack"
+                    },
+                    "operands": {
+                        "no": [0, 0]
+                    }
+                },
+                "clear": {
+                    "doc": {
+                        "help": "Clear the stack"
+                    }
+                }
+            }
         }
     },
     "operands": {

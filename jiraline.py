@@ -1591,6 +1591,75 @@ def commandMerge(ui):
     add_shortlog_event_label(issue_name, [label])
 
 
+def get_stack_path():
+    return os.path.expanduser(os.path.join('~', '.local', 'log', 'jiraline'))
+
+def read_stack():
+    pth = get_stack_path()
+    if not os.path.isdir(pth):
+        os.makedirs(pth)
+    stack = []
+    stack_path = os.path.join(pth, 'stack.json')
+    if os.path.isfile(stack_path):
+        with open(stack_path) as ifstream:
+            stack = json.loads(ifstream.read())
+    return stack
+
+def write_stack(stack):
+    pth = get_stack_path()
+    if not os.path.isdir(pth):
+        os.makedirs(pth)
+    with open(os.path.join(pth, 'stack.json'), 'w') as ofstream:
+        ofstream.write(json.dumps(stack))
+
+def commandStack(ui):
+    ui = ui.down()
+
+    stack = read_stack()
+    if str(ui) == 'ls':
+        msg = '{issue_id}'
+        if '--verbose' in ui:
+            msg = '{index} {issue_id}'
+        if ui.get('--verbose') > 1:
+            msg = '{index} {issue_id} ({push_datetime})'
+        for i, each in enumerate(stack[::-1]):
+            entry_index = '{#}'.replace('#', colorise('white', str(i+1)))
+            push_datetime = datetime.datetime.utcfromtimestamp(each.get('timestamp')).strftime('%Y-%m-%d %H:%M:%S')
+            print(msg.format(
+                index = entry_index,
+                issue_id = colorise(COLOR_ISSUE_KEY, each.get('issue_id')),
+                push_datetime = push_datetime,
+            ))
+    elif str(ui) == 'push':
+        issue_id = expand_issue_name(ui.operands()[0])
+        entry = {
+            'issue_id': issue_id,
+            'timestamp': timestamp(),
+        }
+        stack.append(entry)
+        write_stack(stack)
+    elif str(ui) == 'pop':
+        if len(stack) == 0:
+            exit(1)
+        index = 1
+        if '--index' in ui:
+            index = ui.get('--index')
+        print(stack[-index].get('issue_id'))
+        if index == 1:
+            stack.pop()
+        else:
+            stack = stack[:-index] + stack[-(index-1):]
+        write_stack(stack)
+    elif str(ui) == 'top':
+        if len(stack) == 0:
+            exit(1)
+        print(stack[-1].get('issue_id'))
+    elif str(ui) == 'clear':
+        write_stack([])
+    else:
+        pass
+
+
 
 ################################################################################
 # Program's entry point.
@@ -1634,6 +1703,7 @@ def main():
             commandShortlog,
             commandOpen,
             commandMerge,
+            commandStack,
         )
     except KeyboardInterrupt:
         print() # print a newline
