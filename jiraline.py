@@ -1616,7 +1616,7 @@ def commandStack(ui):
     ui = ui.down()
 
     stack = read_stack()
-    if str(ui) == 'ls':
+    if str(ui) == 'ls' or str(ui) == 'stack':
         msg = '{issue_id}'
         if '--verbose' in ui:
             msg = '{index} {issue_id}'
