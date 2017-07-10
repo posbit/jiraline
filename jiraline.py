@@ -683,6 +683,17 @@ def show_issue(issue_name, ui, cached=None):
 def expand_issue_name(issue_name, project=None):
     if issue_name == '-':
         issue_name = load_last_active_issue_marker()
+
+    stack_prefix = 'stack@'
+    if issue_name.startswith(stack_prefix):
+        n = issue_name[len(stack_prefix):]
+        if not n.isdigit():
+            raise Exception('invalid stack index')
+        n = int(n)
+        if n <= 0:
+            raise Exception('invalid stack index')
+        issue_name = read_stack()[-n].get('issue_id', '')
+
     if issue_name.isdigit():
         issue_name = '{}-{}'.format((project if project is not None else settings.get('default_project')), issue_name)
     return issue_name
