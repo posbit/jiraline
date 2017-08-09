@@ -1305,7 +1305,7 @@ def display_shortlog(shortlog, issues = (), event_types = (), head=None, tail=No
             elif event_name == 'label-add':
                 event_description = 'added labels {}'.format(', '.join(map(lambda l: colorise_repr(COLOR_LABEL, l), event['parameters']['labels'])))
             elif event_name == 'open-issue':
-                event_description = 'opened issue: {}'.format(colorise(COLOR_NOTE, event_description.get('summary')))
+                event_description = 'opened issue: {}'.format(colorise(COLOR_NOTE, event_description.get('summary').strip()))
             else:
                 # if no special description formatting is provided, just display name of the event
                 event_description = '\b\b'
@@ -1544,7 +1544,7 @@ def commandOpen(ui):
                 print(data.get('key', r.text))
             except Exception as e:
                 print(r.text)
-            add_shortlog_event_open_issue(data.get('key'), summary)
+            add_shortlog_event_open_issue(data.get('key'), summary.strip())
     elif str(ui) == 'what':
         r = requests.get('https://{}.atlassian.net/rest/api/2/issue/createmeta'.format(settings.get('domain')), auth=settings.credentials())
         text = r.text
