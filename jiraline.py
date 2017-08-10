@@ -1495,10 +1495,10 @@ def commandOpen(ui):
 
         summary = ''
         if '-s' in ui:
-            summary = ui.get('-s')
-        if not summary.strip():
-            summary = get_message_from_editor('issue_open_message', {'what': 'summary'}, join_lines='')
-        if not summary.strip():
+            summary = ui.get('-s').strip()
+        if not summary:
+            summary = get_message_from_editor('issue_open_message', {'what': 'summary'}, join_lines='').strip()
+        if not summary:
             print('error: aborting due to empty summary')
             exit(1)
 
